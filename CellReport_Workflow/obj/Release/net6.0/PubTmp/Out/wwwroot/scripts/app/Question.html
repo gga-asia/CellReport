@@ -1,0 +1,420 @@
+﻿ <!-- ***** Preloader End ***** -->
+<loading v-bind:active="IsLoading"
+         v-bind:can-cancel="false"
+         v-bind:is-full-page="true"
+         color="rgb(251, 88, 73)"
+         loader="spinner"
+         v-bind:opacity="0.9"
+         background-color="white">
+</loading>
+<!-- ***** Header Area Start ***** -->
+<header class="header-area header-sticky background-header">
+    <div class="container" style="max-width: 960px;">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+
+                    <div class="logo">
+                        <img v-bind:src="RootUrl+'assets/images/LOGO_new_black.png'" style="width: 15rem;" />
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- ***** Header Area End ***** -->
+<!-- ***** About Area Starts ***** -->
+<section class="section" style="margin-top: 5rem!important;">
+
+    <div class="container" style="max-width: 960px; min-height: 80vh; box-shadow: rgba(69, 69, 69, 0.4) 0px 0px 12px 0px; padding-left: 1.5rem; padding-right: 1.5rem;">
+        <div class="row" v-if="Page==1">
+            <div class="col-lg-12 col-md-12 col-xs-12 mb-5">
+                <div class="left-text-content">
+                    <div class="section-heading">
+                        <h2><font color='#fb5849'>{{SurveyData.Title}}</font></h2>
+                    </div>
+                    <!--前文-->
+                    <div v-html="SurveyData.PrefaceMessage" style="padding: 0px; overflow: hidden;" class="ql-editor"></div>
+                </div>
+            </div>
+            <template v-for="item in QuestionDatas">
+
+                <!--單行文字-->
+                <div class="col-lg-12 col-md-12 col-xs-12 mb-5" v-bind:id="item.Id" v-bind:ref="item.Id" v-if="item.Type==1 && item.IsShow" style="display: flex;" v-bind:class="{'pl-4':item.IndentNeed}">
+                    <div class="numberIcon">
+                        <!--題號-->
+                        <div v-if="!item.IndentNeed" class="numberInner">{{item.Number}}.</div>
+                        <div v-if="item.IndentNeed" class="numberInner">{{NumberToLetter(item.Number).toUpperCase()}}.</div>
+                    </div>
+                    <div style="width: 100%">
+                        <div class="mb-1 q_Title">
+                            {{item.Title}}
+                            <span class="q_RequestNeed" v-if="item.RequestNeed">*</span>
+                        </div>
+                        <div class="row">
+                            <div v-if="item.RemarkNeed" class="col-12 mb-2">
+                                <span class="q_Remark">{{item.Remark}}</span>
+                            </div>
+                            <div class="col-12 mb-2" v-if="item.IsShowRequestNeedAlert">
+                                <span class="mutiq RequestNeed">此題必填</span>
+                            </div>
+                            <div class="col-12">
+                                <input class="q_input" type="text" placeholder="請填入資料" v-model="item.Answer" v-on:focusout="IsReadAction(item)" v-bind:disabled="ReadOnly" />
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <!--多行文字-->
+                <div class="col-lg-12 col-md-12 col-xs-12 mb-5" v-bind:id="item.Id" v-bind:ref="item.Id" v-else-if="item.Type==2  && item.IsShow" style="display: flex;" v-bind:class="{'pl-4':item.IndentNeed}">
+                    <div class="numberIcon">
+                        <!--題號-->
+
+                        <div v-if="!item.IndentNeed" class="numberInner">{{item.Number}}.</div>
+                        <div v-if="item.IndentNeed" class="numberInner">{{NumberToLetter(item.Number).toUpperCase()}}.</div>
+                    </div>
+                    <div style="width: 100%">
+                        <div class="mb-1 q_Title">
+                            {{item.Title}}
+                            <span class="q_RequestNeed" v-if="item.RequestNeed">*</span>
+                        </div>
+                        <div class="row">
+                            <div v-if="item.RemarkNeed" class="col-12 mb-2">
+                                <span class="q_Remark">{{item.Remark}}</span>
+                            </div>
+                            <div class="col-12 mb-2" v-if="item.IsShowRequestNeedAlert">
+                                <span class="mutiq RequestNeed">此題必填</span>
+                            </div>
+                            <div class="col-12">
+                                <textarea class="a_textarea" v-autoresize style="height: 120px" v-model="item.Answer" v-on:focusout="IsReadAction(item)" v-bind:disabled="ReadOnly"></textarea>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <!--單選題-->
+                <div class="col-lg-12 col-md-12 col-xs-12 mb-5" v-bind:id="item.Id" v-bind:ref="item.Id" v-else-if="item.Type==3  && item.IsShow" style="display: flex;" v-bind:class="{'pl-4':item.IndentNeed}">
+                    <div class="numberIcon">
+                        <!--題號-->
+                        <div v-if="!item.IndentNeed" class="numberInner">{{item.Number}}.</div>
+                        <div v-if="item.IndentNeed" class="numberInner">{{NumberToLetter(item.Number).toUpperCase()}}.</div>
+                    </div>
+                    <div style="width: 100%">
+
+                        <div class="mb-1 q_Title">{{item.Title}}<span class="q_RequestNeed" v-if="item.RequestNeed">*</span></div>
+
+                        <div class="row">
+                            <div v-if="item.RemarkNeed" class="col-12 mb-2">
+                                <span class="q_Remark">{{item.Remark}}</span>
+                            </div>
+                            <div class="col-12 mb-2" v-if="item.IsShowRequestNeedAlert">
+                                <span class="mutiq RequestNeed">此題必填</span>
+                            </div>
+                            <div v-for="topicOption in item.TopicOptions" class="col-lg-4 col-md-4 col-xs-12">
+                                <div class="qborder" v-bind:class="{'disabled':ReadOnly}" v-on:click="AnswerAction(item,topicOption.Id,topicOption.IsActive)">
+                                    <span class="qcontent">
+                                        <span class="radio_outer" v-bind:class="{'active':topicOption.IsActive}">
+                                            <span class="radio_border"></span>
+                                            <span class="radio_inner"></span>
+                                        </span>
+                                        <span class="t_Title">
+                                            {{topicOption.Title}}
+                                        </span>
+
+                                    </span>
+                                    <div style="text-align: center" v-if="topicOption.IsOther && topicOption.IsActive">
+                                        <input type="text" class="q_input" style="width: 93%; margin-bottom: 15px; margin-top: 15px;"
+                                               v-model="topicOption.Other" v-on:click.stop v-bind:disabled="ReadOnly" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--多選題-->
+                <div class="col-lg-12 col-md-12 col-xs-12 mb-5" v-bind:id="item.Id" v-bind:ref="item.Id" v-else-if="item.Type==4  && item.IsShow" style="display: flex;" v-bind:class="{'pl-4':item.IndentNeed}">
+                    <div class="numberIcon">
+                        <!--題號-->
+                        <div v-if="!item.IndentNeed" class="numberInner">{{item.Number}}.</div>
+                        <div v-if="item.IndentNeed" class="numberInner">{{NumberToLetter(item.Number).toUpperCase()}}.</div>
+                    </div>
+                    <div style="width: 100%">
+
+                        <div class="mb-1 q_Title">
+                            {{item.Title}}
+                            <span class="q_RequestNeed" v-if="item.RequestNeed">*</span>
+
+                        </div>
+                        <div class="row">
+                            <div v-if="item.RemarkNeed" class="col-12 mb-2">
+                                <span class="q_Remark">{{item.Remark}}</span>
+                            </div>
+
+                            <div class="col-12 mb-2">
+                                <span class="mutiq">可複選</span>
+                                <span class="mutiq RequestNeed" v-if="item.IsShowRequestNeedAlert">此題必填</span>
+                            </div>
+
+                            <div v-for="topicOption in item.TopicOptions" class="col-lg-4 col-md-4 col-xs-12">
+                                <div class="qborder" v-bind:class="{'disabled':ReadOnly}" v-on:click="AnswerAction(item,topicOption.Id,topicOption.IsActive)">
+                                    <span class="qcontent">
+                                        <span class="check_outer" v-bind:class="{'active':topicOption.IsActive}">
+                                            <span class="check_border"></span>
+                                        </span>
+                                        <span class="t_Title">
+                                            {{topicOption.Title}}
+                                        </span>
+                                    </span>
+                                    <div style="text-align: center" v-if="topicOption.IsOther && topicOption.IsActive">
+                                        <input type="text" class="q_input" style="width: 93%; margin-bottom: 15px; margin-top: 15px;"
+                                               v-model="topicOption.Other" v-on:click.stop v-bind:disabled="ReadOnly" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--日期-->
+                <div class="col-lg-12 col-md-12 col-xs-12 mb-5" v-bind:id="item.Id" v-bind:ref="item.Id" v-else-if="item.Type==5  && item.IsShow" style="display: flex;" v-bind:class="{'pl-4':item.IndentNeed}">
+                    <div class="numberIcon">
+                        <!--題號-->
+                        <div v-if="!item.IndentNeed" class="numberInner">{{item.Number}}.</div>
+                        <div v-if="item.IndentNeed" class="numberInner">{{NumberToLetter(item.Number).toUpperCase()}}.</div>
+                    </div>
+                    <div style="width: 100%">
+                        <div class="mb-1 q_Title">
+                            {{item.Title}}
+                            <span class="q_RequestNeed" v-if="item.RequestNeed">*</span>
+                        </div>
+                        <div class="row">
+                            <div v-if="item.RemarkNeed" class="col-12 mb-2">
+                                <span class="q_Remark">{{item.Remark}}</span>
+                            </div>
+                            <div class="col-12 mb-2" v-if="item.IsShowRequestNeedAlert">
+                                <span class="mutiq RequestNeed">此題必填</span>
+                            </div>
+                            <div class="col-12">
+                                <date-picker placeholder="YYYY / MM / DD"
+                                             v-bind:lang="'zh-tw'"
+                                             value-type="format"
+                                             format="YYYY/MM/DD"
+                                             v-model="item.Answer"
+                                             v-bind:editable="false"
+                                             v-bind:clearable="false"
+                                             v-bind:disabled="ReadOnly"
+                                             v-on:close="IsReadAction(item)">
+                                    <template v-slot:footer>
+                                        <div style="text-align: center">
+                                            <button class="mx-btn mx-btn-text" v-bind:disabled="ReadOnly" v-on:click="item.Answer='';IsReadAction(item)">
+                                                清除
+                                            </button>
+                                        </div>
+                                    </template>
+                                </date-picker>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--檔案上傳-->
+                <div class="col-lg-12 col-md-12 col-xs-12 mb-5" v-bind:id="item.Id" v-bind:ref="item.Id" v-if="item.Type==6  && item.IsShow" style="display: flex;" v-bind:class="{'pl-4':item.IndentNeed}">
+                    <div class="numberIcon">
+                        <!--題號-->
+                        <div v-if="!item.IndentNeed" class="numberInner">{{item.Number}}.</div>
+                        <div v-if="item.IndentNeed" class="numberInner">{{NumberToLetter(item.Number).toUpperCase()}}.</div>
+                    </div>
+                    <div style="width: 100%">
+                        <div class="mb-1 q_Title">
+                            {{item.Title}}
+                            <span class="q_RequestNeed" v-if="item.RequestNeed">*</span>
+                        </div>
+                        <div class="row">
+                            <div v-if="item.RemarkNeed" class="col-12 mb-2">
+                                <span class="q_Remark">{{item.Remark}}</span>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <span class="q_Remark" style="color: #fb5849">最大 {{item.UploadSetting.FileSize}} MB </span>
+                            </div>
+
+                            <div class="col-12">
+                                <span class="mutiq RequestNeed mb-2" v-if="item.IsShowRequestNeedAlert">此題必填</span>
+                                <span class="mutiq RequestNeed mb-2" v-if="item.IsMaxFileSizeAlert">超過檔案大小</span>
+                                <span class="mutiq RequestNeed mb-2" v-if="item.IsFileFormatAlert">檔案格式有限制</span>
+                            </div>
+                            <div class="col-12">
+                                <input class="q_input" type="file" v-bind:ref="'file_'+item.Id" v-on:change="HandleFileUpload(item,$event)" style="display:none;" v-bind:accept="GetFileAcceptStr(item)" />
+                                <button v-bind:disabled="ReadOnly" v-if="item.Answer==''" type="button" class="btn" v-bind:ref="'filebtn_'+item.Id" style="background-color: #fb5849; color: white;" v-on:click="TriggerFileUploadClick(item)">
+                                    上傳檔案
+                                </button>
+                                <span class="mutiq" style=" padding: 6px 14px; background: #e9e4e4; color: black; border: 1px solid #bdbdbd;" v-else>
+                                    <a v-bind:href="item.OtherAnswer" v-bind:download="item.Answer" style="color: #474747">{{BeautySub(item.Answer,10)}}</a>
+                                    <i class="fa fa-times" style="cursor: pointer; margin-left: 1.5rem; color: #474747" v-on:click="RemoveFile(item)" v-if="!ReadOnly"></i>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <!--分隔頁-->
+                <div class="col-lg-12 col-md-12  col-xs-12" v-bind:id="item.Id" v-bind:ref="item.Id" v-else-if="item.Type==7  && item.IsShow" style="padding-left: 0">
+                    <div class="q_divider">
+                    </div>
+                </div>
+                <!--分類標題-->
+                <div class="col-lg-12 col-md-12  col-xs-12 mb-5" v-bind:id="item.Id" v-bind:ref="item.Id" v-else-if="item.Type==8  && item.IsShow">
+                    <div>
+                        <span style="font-size: 1.5rem; color: #336699; font-weight: bold">{{item.Title}}</span>
+                    </div>
+                    <div v-if="item.RemarkNeed">
+                        <span class="q_Remark" style="padding-left: 11px;">{{item.Remark}}</span>
+                    </div>
+
+                </div>
+                <!--時分-->
+                <div class="col-lg-12 col-md-12 col-xs-12 mb-5" v-bind:id="item.Id" v-bind:ref="item.Id" v-else-if="item.Type==9  && item.IsShow" style="display: flex;" v-bind:class="{'pl-4':item.IndentNeed}">
+                    <div class="numberIcon">
+                        <!--題號-->
+                        <div v-if="!item.IndentNeed" class="numberInner">{{item.Number}}.</div>
+                        <div v-if="item.IndentNeed" class="numberInner">{{NumberToLetter(item.Number).toUpperCase()}}.</div>
+                    </div>
+                    <div style="width: 100%">
+                        <div class="mb-1 q_Title">
+                            {{item.Title}}
+                            <span class="q_RequestNeed" v-if="item.RequestNeed">*</span>
+                        </div>
+                        <div class="row">
+                            <div v-if="item.RemarkNeed" class="col-12 mb-2">
+                                <span class="q_Remark">{{item.Remark}}</span>
+                            </div>
+                            <div class="col-12 mb-2" v-if="item.IsShowRequestNeedAlert">
+                                <span class="mutiq RequestNeed">此題必填</span>
+                            </div>
+                            <div class="col-12">
+                                <date-picker placeholder="HH:MM"
+                                             v-bind:lang="'zh-tw'"
+                                             value-type="format"
+                                             format="HH:mm"
+                                             type="time"
+                                             v-model="item.Answer"
+                                             v-bind:editable="false"
+                                             v-bind:clearable="false"
+                                             v-on:close="IsReadAction(item)" v-bind:disabled="ReadOnly">
+                                    <template v-slot:footer>
+                                        <div style="text-align: center">
+                                            <button class="mx-btn mx-btn-text" v-on:click="item.Answer='';IsReadAction(item)" v-bind:disabled="ReadOnly">
+                                                清除
+                                            </button>
+                                        </div>
+                                    </template>
+                                </date-picker>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </template>
+
+            <div class="col-lg-12 col-md-12 col-xs-12  mb-5" style="text-align: center" v-if="!ReadOnly">
+                <button type="button" class="btn btn-lg" style="background-color: #fb5849; color: white;" v-on:click="Submit()">
+                    送出問卷
+                </button>
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-xs-12" style="margin-bottom: 100px">
+                <div class="left-text-content">
+
+                    <!--後文-->
+                    <div v-html="SurveyData.EpilogueMessage" style="padding: 0px" class="ql-editor"></div>
+                </div>
+            </div>
+            <div class="fixed-footer" v-if="!ReadOnly">
+                <div class="footer-conter">
+                    <div class="footer-bar">
+                        <div class="footer-bar-1">
+                            <div class="footer-bar-2">
+                                <div class="footer-bar-3" v-bind:style="{ transform: 'scaleX('+ SurveyProgress + ')' }"></div>
+                            </div>
+                            <span class="footer-bar-text">{{SurveyProgressPercent()}}</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row" v-if="Page==2">
+            <div class="col-lg-12 col-md-12 col-xs-12 mt-5">
+                <div class="left-text-content">
+                    <div class="section-heading" style="text-align:center">
+                        <h2><font color='#fb5849'>收到你的回覆囉</font></h2>
+
+                    </div>
+                    <!--前文-->
+                    <div v-html="SurveyData.ThanksMessage" style=" padding: 15px 30px; overflow: hidden;" class="ql-editor"></div>
+                    <div style="text-align: center; margin: 30px auto;" v-if="SurveyData.ThankPageButtonActive">
+                        <a class="btn btn-lg" style="background-color: #fb5849; color: white;" v-bind:href="SurveyData.ThankPageButtonUrl">
+                            {{SurveyData.ThankPageButtonText}}
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" v-if="Page==3">
+            <div class="col-lg-12 col-md-12 col-xs-12 mt-5">
+                <div class="left-text-content">
+                    <div class="section-heading" style="text-align:center">
+                        <h2><font color='#fb5849'>查無此問卷！</font></h2>
+                    </div>
+                    <!--前文-->
+                    <div style="padding: 0px; overflow: hidden;" class="">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" v-if="Page==4">
+            <div class="col-lg-12 col-md-12 col-xs-12 mt-5">
+                <div class="left-text-content">
+                    <div class="section-heading" style="text-align:center">
+                        <h2><font color='#fb5849'>本問卷尚未公開！</font></h2>
+                    </div>
+                    <!--前文-->
+                    <div style="padding: 0px; overflow: hidden;" class="">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" v-if="Page==5">
+            <div class="col-lg-12 col-md-12 col-xs-12 mt-5">
+                <div class="left-text-content">
+                    <div class="section-heading" style="text-align:center">
+                        <h2><font color='#fb5849'>本問卷不在有效期間！</font></h2>
+                    </div>
+                    <!--前文-->
+                    <div style="padding: 0px; overflow: hidden;" class="">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" v-if="Page==6">
+            <div class="col-lg-12 col-md-12 col-xs-12 mt-5">
+                <div class="left-text-content">
+                    <div class="section-heading" style="text-align:center">
+                        <h2><font color='#fb5849'>無法預覽此問卷回覆！</font></h2>
+                    </div>
+                    <!--前文-->
+                    <div style="padding: 0px; overflow: hidden;" class="">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ***** About Area Ends ***** -->

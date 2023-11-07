@@ -1,0 +1,52 @@
+﻿
+#total-content {
+    overflow: -moz-hidden-unscrollable;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    max-height: 95vh;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+    #total-content::-webkit-scrollbar {
+        display: none;
+    }
+
+.titleRow {
+    font-size: 6vw;
+    margin-bottom: 2vh;
+}
+
+.text-ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.borderRounded {
+    border: 4px solid #dee2e6 !important;
+    border-radius: 50% !important;
+    height: 30vw;
+    padding: 4vw;
+}
+
+.roundedTitle {
+    font-size: 3vw;
+}
+
+.roundedNumber {
+    font-size: 7vw;
+}
+
+.colorRed {
+    color: red;
+}
+
+.marqueeDiv {
+    margin-top: 2vh;
+    font-size: 4.5rem;
+}
+
+#LoadingModal {
+    color: black;
+}

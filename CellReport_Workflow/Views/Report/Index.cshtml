@@ -1,0 +1,1334 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Layout = "_Layout1";
+}
+
+@*<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+*@
+
+
+
+<style>
+    #surveyTable tbody td {
+        vertical-align: middle;
+    }
+
+    .v-enter-active,
+    .v-leave-active {
+        transition: opacity 0.5s ease;
+    }
+
+    .v-enter-from,
+    .v-leave-to {
+        opacity: 0;
+    }
+
+
+    .ql-editor strong {
+        font-weight: bold;
+    }
+
+    .settingicon {
+        margin: 2px 3px 2px 3px;
+        padding: 6px;
+        border-radius: 2px;
+        min-width: 28px;
+        text-align: center;
+    }
+
+    .numberIcon {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        text-align: center;
+        border-radius: 3px;
+        cursor: pointer;
+        vertical-align: top;
+        position: relative;
+        padding-top: 6px;
+        font-size: 14px;
+        color: #fff;
+        margin-top: 4px;
+        background-color: #3276b1;
+    }
+
+    .bootbox-body {
+        font-size: 18px;
+    }
+
+    .rowIcon {
+        font-size: 18px;
+        margin: 4px;
+        color: rgb(75 75 75);
+        cursor: pointer;
+    }
+
+    .css-1vadu8l {
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: start;
+        justify-content: flex-start;
+        flex-flow: row nowrap;
+        margin-bottom: 16px;
+    }
+
+    .css-ba1496 {
+        border-radius: 4px;
+        border: 1px solid rgb(238, 238, 238);
+        color: rgb(61, 186, 144);
+        padding: 3px 8px;
+        margin-right: 8px;
+        font-size: 16px;
+        line-height: 1.5;
+        width: 100%;
+        background-color: rgb(250, 250, 250);
+    }
+
+    .css-1v8e8oy {
+        color: rgb(255, 255, 255);
+        font-size: 14px;
+        font-weight: 500;
+        padding: 6px 10px;
+        background-color: #3276b1;
+        transition: all 0.1s ease-in-out 0s;
+        border: none;
+        border-radius: 4px;
+        width: 124px;
+        text-align: center;
+        cursor: pointer;
+    }
+</style>
+
+<link href="~/css/quill.css" rel="stylesheet" />
+<script src="~/js/katex.min.js"></script>
+<script src="~/js/highlight.min.js"></script>
+<script src="~/js/quill.js"></script>
+
+<div class="row">
+
+    <div class="col-lg-12 col-md-12" id="surveyList" v-cloak>
+        <transition v-on:after-leave="Afterleave">
+            <div class="panel"
+                 v-show="IsShow"
+                 data-panel-collapsed="false"
+                 data-panel-fullscreen="false"
+                 data-panel-close="false"
+                 data-panel-locked="false"
+                 data-panel-refresh="false"
+                 data-panel-custombutton="false"
+                 data-panel-reset="false"
+                 data-panel-color="false">
+                <div class="panel-hdr  bg-fusion-500">
+                    <h2>
+                        <vue-button class="mr-2" icon="fa-search" color="info" v-on:click="Search">
+                            查詢
+                        </vue-button>
+                        <vue-button class="mr-2" icon="fa-redo" color="info" v-on:click="GetSurveyTableDraw">
+                            重新整理
+                        </vue-button>
+                        <vue-button class="mr-2" icon="fa-file-pdf" color="info" v-on:click="GetAllPDF" id="download">
+                            批次觀看
+                        </vue-button>
+                        <vue-button icon="fa-upload" color="info" v-on:click="UploadReport" id="upload">
+                            批次上傳
+                        </vue-button>
+                    </h2>
+                </div>
+                <div class="panel-container show ">
+                    <div class="row p-2">
+                        <div class="col-12">
+                            <div class="form-row" style="font-size: 14px;">
+                                <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.Id" @* v-on:keyup="GetSurveyTableList"*@>
+                                    客戶代號
+                                </vue-input>
+                                <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.ProductType" @*v-on:keyup="GetSurveyTableList"*@>
+                                    產品別
+                                </vue-input>
+                                <vue-select class="col-lg-3 col-md-3 mb-1" v-model="Filter.Status" @*v-on:change="GetSurveyTableList"*@
+                                            v-bind:options="StatusOptions">
+                                    簽核狀態
+                                </vue-select>
+
+                            </div>
+                            <div class="form-row" style="font-size: 14px;">
+                                <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.Finish_s" @* v-on:keyup="GetSurveyTableList"*@ type="date">
+                                    完成日(起)
+                                </vue-input>
+
+                                <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.Finish_e" @*v-on:keyup="GetSurveyTableList"*@ type="date">
+                                    完成日(訖)
+                                </vue-input>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <table id="surveyTable" class="table table-bordered table-hover table-striped w-100">
+                        <thead>
+                            <tr>
+                                <th>內容</th>
+                                @*<th>ID</th>*@
+                                <th>客戶代號</th>
+                                <th>姓名</th>
+                                <th>完成日</th>
+                                <th>產品別</th>
+                                @* <th>出報告日</th>*@
+                                <th>簽核狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+
+
+</div>
+@section Scripts{
+    <script>
+
+        $(document).ready(() => {
+
+            console.log(ID);
+            console.log(NAME);
+            console.log(DEPARTMENT);
+            console.log(RANK);
+
+
+            $.validator.setDefaults({
+                ignore: []
+            });
+
+            var surveyList = new Vue({
+                el: "#surveyList",
+                data: {
+                    IsShow: true,
+                    SurveyTable: {},
+                    StatusOptions: [
+                        { "text": "請選擇", "value": "" },
+                        { "text": "Lab送出資料", "value": "Lab送出資料" },
+                        { "text": "品質主管複核", "value": "品質主管複核" },
+                        { "text": "Lab主管複核", "value": "Lab主管複核" },
+                        { "text": "簽核完成", "value": "簽核完成" },
+                        { "text": "報告上傳", "value": "報告上傳" }
+                    ],
+                    Filter: {
+                        Id: "",
+                        ProductType: "",
+                        Status: "",
+                        Finish_s: "",
+                        Finish_e: "",
+                    }
+                },
+                components: {
+                    loading: VueLoading
+                },
+                mounted() {
+                    //$.ajax({
+                    //    url: `@Url.Content("~/Report/Index")`,
+                    //    type: "post",
+                    //    dataType: "json",
+                    //    data: function data(d) {
+                    //        d.Filter = JSON.stringify(_this.Filter);
+                    //    }
+                    //})
+                    //    .done(data => {
+                    //        console.log(data);
+                    //    });
+                    if(RANK != "部門主管"){
+                       $("#download, #upload").css("display","none");
+                    }
+
+                    this.InitSurveyTable();
+                },
+                methods: {
+                    Search() {
+                        //surveyContent.ResetData();
+                        console.log(this.Filter);
+                        $("#surveyTable").DataTable().destroy();
+                        $('#surveyTable').empty();
+                        this.InitSurveyTable();
+                        //this.IsShow = false;
+                    },
+                    OpenResultUrl(e) {
+                        var id = $(e.currentTarget).siblings("input.hiddenDemoData").val();
+                        window.location.assign('@Url.Content("~/Report/Detail")' + `?Id=${id}`);
+                    },
+                    Afterleave() {
+                        surveyContent.IsShow = true;
+                    },
+                    GetSurveyTableDraw() {
+                        this.SurveyTable.ajax.reload(null, false)
+                    },
+                    GetAllPDF() {
+                        let output = this.GetCheck();
+                        console.log(output);
+                        $.ajax({
+                            url: `@Url.Content("~/Report/GetAllPDF")`,
+                            type: "post",
+                            dataType: "json",
+                            data: {
+                                datas: output
+                            },
+                        })
+                            .done(data => {
+                                console.log(data);
+                            });
+                    },
+                    UploadReport() {
+                        let output = this.GetCheck();
+                        console.log(output);
+                        $.ajax({
+                            url: `@Url.Content("~/Report/UploadReport")`,
+                            type: "post",
+                            dataType: "json",
+                            data: {
+                                datas: output
+                            },
+                        })
+                            .done(data => {
+                                console.log(data);
+                            });
+                    },
+                    GetCheck() {
+                        let checkboxs = document.querySelectorAll("input[type='checkbox']:checked");
+                        let output = [];
+                        checkboxs.forEach((checkbox) => {
+                            output.push(checkbox.name);
+                        });
+                        //console.log(output);
+                        return output;
+                    },
+                    GetSurveyTableList() {
+                        this.SurveyTable.ajax.reload();
+                    },
+                    InitSurveyTable() {
+                        var _this = this;
+                        _this.SurveyTable = $("#surveyTable").DataTable({
+
+                            searching: false,
+                            autoWidth: false,
+                            scrollX: true,
+                            lengthChange: false,
+                            pageLength: 10,
+                            responsive: false,
+                            //serverSide: true,
+                            deferRender: true,
+                            //processing: true,
+                            ordering: true,
+                            order: [[1, 'asc']],
+                            columnDefs: [
+                            ],
+                            lengthMenu: [10],
+                            language: {
+                                url: `@Url.Content("~/lang/dataTables/tw.json")`
+                            },
+                            columns: [
+                                {
+                                    data: "id",
+                                    render: function (data, type, row) {
+                                        var reply = '<i class="fa fa-list rowIcon" title="內容"></i>'
+                                        //var link = '<i class="fa fa-link rowIcon" title="開啟連結"></i><br/>'
+                                        return reply //+ link
+                                    },
+                                    sortable: false
+                                },
+                                //{
+                                //    data: "id",
+                                //    sortable: false
+                                //},
+                                {
+                                    data: "cus_ct_id",
+                                    render: function (data) {
+                                        return data;
+                                    }
+                                },
+                                {
+                                    data: "motheR_NAME",
+                                },
+                                //{
+                                //    data: "reportDate",
+                                //},
+                                {
+                                    data: "final_Date",
+                                    //render: function (data) {
+                                    //    if (data != "") {
+                                    //        return moment.utc(data).local().format('YYYY/MM/DD HH:mm:ss');
+                                    //    }
+                                    //    return "";
+                                    //}
+                                },
+                                {
+                                    data: "productType",
+                                    //render: function (data) {
+                                    //    if (data != "") {
+                                    //        return moment.utc(data).local().format('YYYY/MM/DD HH:mm:ss');
+                                    //    }
+                                    //    return "";
+                                    //}
+                                },
+                                {
+                                    data: "stage",
+                                    //render: function (data, type, row) {
+                                    //    if (data == 0) {
+                                    //        return "關閉"
+                                    //    }
+                                    //    return "公開"
+                                    //},
+                                    sortable: true
+                                },
+                            ],
+
+                            ajax: {
+                                url: `@Url.Content("~/Report/Index")`,
+                                dataSrc: "",
+                                async: true,
+                                cache: false,
+                                type: "POST",
+                                //data: function data(d) {
+                                //    console.log(this.Filter)
+                                //    d.Filter = JSON.stringify(_this.Filter);
+                                //    console.log(d.Filter)
+                                //},
+                                data: {
+                                    Id: _this.Filter.Id,
+                                    ProductType: _this.Filter.ProductType,
+                                    Status: _this.Filter.Status,
+                                    Finish_s: _this.Filter.Finish_s,
+                                    Finish_e: _this.Filter.Finish_e
+                                },
+                                beforeSend() {
+                                    //_this.ContantUsApps = [];
+                                }
+                            },
+
+
+                            createdRow(row, data, index) {
+                                var hidden = $('<input/>', {
+                                    type: 'hidden',
+                                    value: data.cus_ct_id,
+                                    class: 'hiddenDemoData'
+                                });
+                                $('td', row).eq(0).append(hidden);
+
+                                if (data.stage == "簽核完成") {
+                                    if (DEPARTMENT == "細胞實驗室" && RANK == "部門主管") {
+                                        if(data.productType == "ADSC" ||data.productType == "MSC" ||data.productType == "TSC"){
+                                            console.log(data.productType);
+                                           var CheckBox = $('<input/>', {
+                                               type: 'checkbox',
+                                               class: 'ustom-control-input check',
+                                               style: 'margin-left:20%; width:40px',
+                                               name: data.cus_ct_id
+                                           });
+                                           $('td', row).eq(0).append(CheckBox);
+                                        }
+                                    }
+                                    else if (DEPARTMENT == "造血實驗室" && RANK == "部門主管") {
+                                         if(data.productType == "CB" ||data.productType == "PBSC"){
+                                            var CheckBox = $('<input/>', {
+                                                type: 'checkbox',
+                                                class: 'ustom-control-input check',
+                                                style: 'margin-left:20%; width:40px',
+                                                name: data.cus_ct_id
+                                            });
+                                            $('td', row).eq(0).append(CheckBox);                                         
+                                         }
+                                    }
+                                }
+                            }
+                        });
+                        //$('#surveyTable tbody').on('click', '.fa-edit', this.Edit);
+                        //$('#surveyTable tbody').on('click', '.fa-link', this.Openlink);
+                        $('#surveyTable tbody').on('click', '.fa-list', this.OpenResultUrl);
+                    },
+
+                }
+            });
+
+            //var SurveyDataObj = {
+            //    "Id": "",
+            //    "Title": "",
+            //    "PrefaceMessage": "",
+            //    "Status": 0,
+            //    "ValidTimeActive": 0,
+            //    "ValidStartTime": "",
+            //    "ValidEndTime": "",
+            //    "CRM_CustomerIdActive": 0 == 1,
+            //    "CRM_ContractIdActive": 0 == 1,
+            //    "ThankPageButtonActive": 0 == 1,
+            //    "ThankPageButtonText": "",
+            //    "ThankPageButtonUrl": "",
+            //    "Emails": [],
+            //    "LinkQuestions": []
+            //};
+
+            //var surveyContent = new Vue({
+            //    el: "#surveyContent",
+            //    data: {
+            //        InputEmail: "",
+            //        UploadSetting: {
+            //            Id: "",
+            //            FileSize: 5,
+            //            FileFormatRestrictions: true,
+            //            Word: true,
+            //            Image: true,
+            //            PPT: true,
+            //            Video: true,
+            //            Excel: true,
+            //            Audio: true
+            //        },
+            //        IsLoading: false,
+            //        IsShow: false,
+            //        Page: 1,
+            //        QEditor: {
+            //            Preface: {},
+            //            Epilogue: {},
+            //            Thanks: {}
+            //        },
+            //        SurveyData: JSON.parse(JSON.stringify(SurveyDataObj)),
+
+            //        FileSizeOptions: [
+            //            { "text": "1 MB", "value": 1 },
+            //            { "text": "5 MB", "value": 5 },
+            //            { "text": "10 MB", "value": 10 }
+
+            //        ],
+
+            //        StatusOptions: [
+            //            { "text": "關閉", "value": 0 },
+            //            { "text": "公開", "value": 1 }
+
+            //        ],
+            //        ValidTimeActive: [
+            //            { "text": "關閉", "value": 0 },
+            //            { "text": "開啟", "value": 1 }
+
+            //        ], RightItems: [
+            //            { value: 1, text: '單行文字', IsActive: true },
+            //            { value: 2, text: '多行文字', IsActive: true },
+            //            { value: 3, text: '單選題', IsActive: true },
+            //            { value: 4, text: '多選題', IsActive: true },
+            //            { value: 5, text: '日期', IsActive: true },
+            //            { value: 9, text: '時分', IsActive: true },
+            //            { value: 6, text: '檔案上傳', IsActive: true },
+            //            { value: 7, text: '分隔線', IsActive: true },
+            //            { value: 8, text: '分類標題', IsActive: true },
+            //        ],
+            //        LeftItems: [],
+            //        highlightedIndex: -1,
+            //        SurveyDomain: window.location.origin + master.RootUrl + "q/Survey.aspx?Id=",
+            //        MainForm: {},
+            //        QuestionForm: {},
+            //        TempLinkId: {
+            //            Id: "",//題目Id
+            //            OptionId: ""// 選項Id
+            //        },
+            //        TempLinkQuestions: [],
+            //        LinkQuestions: [],
+
+            //    },
+            //    components: {
+            //        'loading': VueLoading,
+            //    },
+
+            //    watch: {
+            //        LeftItems() {
+            //            this.WatchNumber();
+            //        },
+            //    },
+            //    mounted() {
+            //        //this.QEditor.Preface = new Quill('#PrefaceEditor', {
+            //        //    modules: {
+            //        //        syntax: true,
+            //        //        toolbar: '#PrefaceToolbar'
+            //        //    },
+            //        //    placeholder: '',
+            //        //    theme: 'snow'
+            //        //});
+            //        //this.QEditor.Epilogue = new Quill('#EpilogueEditor', {
+            //        //    modules: {
+            //        //        syntax: true,
+            //        //        toolbar: '#EpilogueToolbar'
+            //        //    },
+            //        //    placeholder: '',
+            //        //    theme: 'snow'
+            //        //});
+            //        //this.QEditor.Thanks = new Quill('#ThanksEditor', {
+            //        //    modules: {
+            //        //        syntax: true,
+            //        //        toolbar: '#ThanksToolbar'
+            //        //    },
+            //        //    placeholder: '',
+            //        //    theme: 'snow'
+            //        //});
+            //        this.$nextTick(() => {
+            //            $(".icon-tooltip").each(function () {
+            //                $(this).tooltip();
+
+            //            });
+            //        })
+            //        this.InitFormValidator();
+            //    },
+
+            //    methods: {
+            //        OtherClick(item) {
+            //            item.Other.Need = !item.Other.Need; if (item.Other.Need) { item.Other.Title = '其他' };
+            //            var index = this.LinkQuestions.findIndex(e => e.Id == item.Id && e.OptionId == '-1');
+            //            if (index != -1) {
+            //                this.LinkQuestions.splice(index, 1)
+            //            }
+
+            //        },
+            //        NoneClick(item) {
+            //            item.None.Need = !item.None.Need; if (item.None.Need) { item.None.Title = '以上皆非' };
+            //            var index = this.LinkQuestions.findIndex(e => e.Id == item.Id && e.OptionId == '-2');
+            //            if (index != -1) {
+            //                this.LinkQuestions.splice(index, 1)
+            //            }
+            //        },
+            //        GetLinkQuestions(linkData) {
+            //            var _this = this;
+            //            var list = [];
+
+            //            linkData.LinkQuestions.forEach((Id) => {
+            //                var a = _this.LeftItems.find(e => e.Id == Id);
+            //                if (!!a) {
+            //                    list.push(a);
+            //                }
+
+
+            //            });
+            //            return list;
+
+            //        },
+            //        ConfirmLinkQuestions() {
+            //            var _this = this;
+            //            var data = {
+            //                Id: _this.TempLinkId.Id,
+            //                OptionId: _this.TempLinkId.OptionId,
+            //                Type: 0,//接題是0，跳題是1
+            //                LinkQuestions: [],
+            //            }
+            //            _this.TempLinkQuestions.forEach((item) => {
+            //                if (item.Checked) {
+            //                    data.LinkQuestions.push(item.Id)
+            //                }
+            //            });
+            //            var index = _this.LinkQuestions.findIndex((e) => e.Id == data.Id && e.OptionId == data.OptionId && e.Type == 0);
+            //            if (index > -1) {
+            //                _this.LinkQuestions.splice(index, 1)
+            //            }
+            //            if (data.LinkQuestions.length > 0) {
+            //                _this.LinkQuestions.push(data);
+            //            }
+            //            $("#LinkQuestionModal").modal("hide");
+
+
+            //        },
+            //        OpenLinkQuestion(Id, topicOption) {
+            //            var _this = this;
+            //            _this.TempLinkId.Id = Id;
+            //            _this.TempLinkId.OptionId = topicOption.Id;
+            //            var old = _this.LinkQuestions.find((e) => e.Id == Id && e.OptionId == _this.TempLinkId.OptionId && e.Type == 0);
+
+
+            //            _this.TempLinkQuestions = _this.LeftItems.map((item) => {
+            //                var data = {};
+            //                data.Checked = false;
+            //                if (!!old) {
+            //                    if (old.LinkQuestions.findIndex(e => e == item.Id) > -1) {
+            //                        data.Checked = true;
+            //                    }
+            //                }
+            //                data.IndentNeed = item.IndentNeed;
+            //                data.Number = item.Number;
+            //                data.Id = item.Id;
+            //                data.Title = item.Title;
+            //                return data;
+            //            });
+            //            $("#LinkQuestionModal").modal({
+            //                backdrop: "static"
+            //            });
+            //        },
+            //        Delete() {
+            //            var _this = this;
+            //            SmartMessageBox({
+            //                title: "注意",
+            //                message: "確定要 刪除 問卷嗎?",
+            //                callback(res) {
+            //                    if (res) {
+            //                        _this.ReturnAjax(
+            //                            "Api/Admin/DelSurvey.ashx",
+            //                            {
+            //                                "SurveyId": _this.SurveyData.Id,
+            //                            },
+            //                            function (result) {
+
+            //                                _this.IsShow = false;
+
+            //                            },
+            //                            "IsLoading"
+            //                        )
+            //                    }
+            //                }
+            //            })
+            //        },
+            //        DelEmail(index) {
+            //            var _this = this;
+            //            _this.SurveyData.Emails.splice(index, 1)
+
+            //        },
+            //        AddEmail() {
+            //            var _this = this;
+            //            var emailRule = /^\w+((-\w+)|(\.\w+))*\@@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+            //            if (_this.InputEmail.search(emailRule) != -1) {
+            //                _this.SurveyData.Emails.push(_this.InputEmail);
+            //                _this.InputEmail = "";
+            //            } else {
+            //                openWarningDialog("不符合電子郵件格式", 10)
+            //            }
+
+            //        },
+            //        GetUploadSettingFile(UploadSetting) {
+            //            if (UploadSetting.FileFormatRestrictions) {
+            //                var str = "";
+            //                if (UploadSetting.Word) {
+            //                    str += "文件 ";
+            //                }
+            //                if (UploadSetting.Image) {
+            //                    str += "圖片 ";
+            //                }
+            //                if (UploadSetting.PPT) {
+            //                    str += "簡報 ";
+            //                }
+            //                if (UploadSetting.Video) {
+            //                    str += "影片 ";
+            //                }
+            //                if (UploadSetting.Excel) {
+            //                    str += "試算表 ";
+            //                }
+            //                if (UploadSetting.Audio) {
+            //                    str += "音檔 ";
+            //                }
+            //                return str;
+
+
+            //            } else {
+            //                return "無"
+            //            }
+            //        },
+            //        FileFormatRestrictions(checked) {
+            //            var _this = this;
+            //            if (!checked) {
+
+            //                _this.UploadSetting.Word = false;
+            //                _this.UploadSetting.Image = false;
+            //                _this.UploadSetting.PPT = false;
+            //                _this.UploadSetting.Video = false;
+            //                _this.UploadSetting.Excel = false;
+            //                _this.UploadSetting.Audio = false;
+
+            //            }
+
+
+            //        },
+            //        ConfirmUploadSetting() {
+            //            var _this = this;
+            //            if (_this.UploadSetting.FileFormatRestrictions) {
+            //                if (!(this.UploadSetting.Word
+            //                    || _this.UploadSetting.Image
+            //                    || _this.UploadSetting.PPT
+            //                    || _this.UploadSetting.Video
+            //                    || _this.UploadSetting.Excel
+            //                    || _this.UploadSetting.Audio)) {
+            //                    openWarningDialog("至少選擇一個檔案格式", 10)
+            //                    return;
+            //                }
+            //            }
+
+
+
+            //            var item = _this.LeftItems.find(e => e.Id == _this.UploadSetting.Id);
+            //            if (!!item) {
+            //                item.UploadSetting = {
+            //                    FileSize: _this.UploadSetting.FileSize,
+            //                    FileFormatRestrictions: _this.UploadSetting.FileFormatRestrictions,
+            //                    Word: _this.UploadSetting.Word,
+            //                    Image: _this.UploadSetting.Image,
+            //                    PPT: _this.UploadSetting.PPT,
+            //                    Video: _this.UploadSetting.Video,
+            //                    Excel: _this.UploadSetting.Excel,
+            //                    Audio: _this.UploadSetting.Audio
+            //                }
+            //            }
+            //            $("#UploadSettingModal").modal("hide");
+
+            //        },
+            //        OpenUploadSettingModal(item) {
+
+
+            //            this.UploadSetting = JSON.parse(JSON.stringify(item.UploadSetting));
+            //            this.UploadSetting.Id = item.Id
+            //            $("#UploadSettingModal").modal({
+            //                backdrop: "static"
+            //            });
+
+            //        },
+            //        InitFormValidator() {
+            //            var _this = this;
+
+            //            _this.MainForm = $("#MainForm").validate({
+            //                rules: {
+            //                    "surveyTitle": {
+            //                        required: true,
+            //                    },
+            //                    "ValidStartTime": {
+            //                        required: {
+            //                            depends() {
+            //                                return _this.SurveyData.ValidTimeActive;
+            //                            }
+            //                        }
+            //                    },
+            //                    "ValidEndTime": {
+            //                        required: {
+            //                            depends() {
+            //                                return _this.SurveyData.ValidTimeActive;
+            //                            }
+            //                        }
+            //                    },
+            //                    "ThankPageButtonText": {
+            //                        required: {
+            //                            depends() {
+            //                                return _this.SurveyData.ThankPageButtonActive;
+            //                            }
+            //                        }
+            //                    },
+            //                    "ThankPageButtonUrl": {
+            //                        required: {
+            //                            depends() {
+            //                                return _this.SurveyData.ThankPageButtonActive;
+            //                            }
+            //                        }
+            //                    }
+
+
+            //                },
+            //                highlight: function (element) {
+            //                    $(element).parent('.input-group').removeClass('has-success').addClass('has-error');
+            //                },
+            //                unhighlight: function (element) {
+            //                    $(element).parent('.input-group').removeClass('has-error');
+            //                },
+            //                errorElement: 'span',
+            //                errorClass: 'help-block',
+            //                errorPlacement: function (error, element) {
+            //                    if (element.parent('.input-group').length) {
+            //                        error.insertAfter(element.parent());
+            //                    }
+            //                    else {
+            //                        error.insertAfter(element);
+            //                    }
+            //                }
+
+            //            })
+
+            //            _this.QuestionForm = $("#QuestionForm").validate({
+
+            //                highlight: function (element) {
+            //                    $(element).parent().removeClass('has-success').addClass('has-error');
+            //                },
+            //                unhighlight: function (element) {
+            //                    $(element).parent().removeClass('has-error');
+            //                },
+            //                errorElement: 'div',
+            //                errorClass: 'help-block mb-1',
+            //                errorPlacement: function (error, element) {
+            //                    if (element.hasClass("optionTitle")) {
+            //                        error.css("margin-left", "35px");
+            //                        error.insertAfter(element.parent());
+            //                    } else if (element.hasClass("Title")) {
+            //                        error.insertAfter(element.parent());
+            //                    }
+
+            //                }
+
+            //            })
+
+
+            //            $.validator.addClassRules('Title', {
+            //                required: true,
+            //            });
+            //            $.validator.addClassRules('optionTitle', {
+            //                required: true,
+            //            });
+
+
+            //        },
+            //        async CopyUrl(url) {
+            //            try {
+            //                await navigator.clipboard.writeText(url);
+            //                openSuccessDialog("已複製", 3);
+            //            } catch (err) {
+            //                openWarningDialog("複製失敗", 10);
+            //            }
+
+            //        },
+            //        ResetData() {
+            //            var _this = this;
+            //            _this.Page = 1;
+            //            _this.SurveyData = JSON.parse(JSON.stringify(SurveyDataObj));
+            //            _this.LeftItems = [];
+            //            _this.highlightedIndex = -1;
+            //            _this.QEditor.Preface.root.innerHTML = "";
+            //            _this.QEditor.Epilogue.root.innerHTML = "";
+            //            _this.QEditor.Thanks.root.innerHTML = "";
+            //        },
+            //        GetSurvey(Id) {
+            //            var _this = this;
+            //            this.ResetData();
+            //            _this.ReturnAjax(
+            //                "Api/Admin/GetSurvey.ashx",
+            //                {
+            //                    "SurveyId": Id,
+            //                },
+            //                function (result) {
+
+            //                    var data = result.Data;
+
+            //                    _this.SurveyData = {
+            //                        "Id": data.Id,
+            //                        "Title": data.Title,
+            //                        "PrefaceMessage": data.PrefaceMessage,
+            //                        "EpilogueMessage": data.EpilogueMessage,
+            //                        "ThanksMessage": data.ThanksMessage,
+            //                        "Status": data.Status,
+            //                        "ValidTimeActive": data.ValidTimeActive,
+            //                        "ValidStartTime": (data.ValidTimeActive == 0 ? "" : data.ValidStartTime),
+            //                        "ValidEndTime": (data.ValidTimeActive == 0 ? "" : data.ValidEndTime),
+            //                        "CRM_CustomerIdActive": data.CRM_CustomerIdActive == 1,
+            //                        "CRM_ContractIdActive": data.CRM_ContractIdActive == 1,
+            //                        "ThankPageButtonActive": data.ThankPageButtonActive == 1,
+            //                        "ThankPageButtonText": data.ThankPageButtonText,
+            //                        "ThankPageButtonUrl": data.ThankPageButtonUrl,
+            //                        "Emails": data.Emails,
+            //                    };
+            //                    data.QuestionDatas.forEach(e => {
+            //                        var leftitem = JSON.parse(e.JsonSetting);
+            //                        if (typeof leftitem.Other === "undefined") {
+            //                            leftitem.Other = {
+            //                                Need: false,
+            //                                Title: "",
+            //                            }
+            //                        }
+            //                        if (typeof leftitem.None === "undefined") {
+            //                            leftitem.None = {
+            //                                Need: false,
+            //                                Title: "",
+            //                            }
+            //                        }
+            //                        leftitem.TopicOptions.forEach(e => {
+            //                            if (typeof e.Id === "undefined") {
+            //                                e.Id = _this.Guid();
+            //                            }
+
+            //                        })
+
+
+            //                        _this.LeftItems.push(leftitem);
+
+            //                    });
+
+
+            //                    //this.highlightedIndex = -1;
+            //                    _this.QEditor.Preface.root.innerHTML = data.PrefaceMessage;
+            //                    _this.QEditor.Epilogue.root.innerHTML = data.EpilogueMessage;
+            //                    _this.QEditor.Thanks.root.innerHTML = data.ThanksMessage;
+            //                    _this.LinkQuestions = data.LinkQuestions;
+
+            //                    surveyList.IsShow = false;
+
+
+
+            //                },
+            //                "IsLoading"
+
+            //            )
+
+
+            //        },
+            //        SurveyDataProcess() {
+            //            var _this = this;
+            //            _this.SurveyData.PrefaceMessage = _this.QEditor.Preface.root.innerHTML;
+            //            _this.SurveyData.EpilogueMessage = _this.QEditor.Epilogue.root.innerHTML;
+            //            _this.SurveyData.ThanksMessage = _this.QEditor.Thanks.root.innerHTML;
+            //            var surveyData = JSON.parse(JSON.stringify(_this.SurveyData));
+            //            var questionDatas = [];
+            //            _this.LeftItems.forEach((data) => {
+            //                questionData = {
+            //                    SurveyId: "",
+            //                    Id: data.Id,
+            //                    Title: data.Title,
+            //                    Remark: data.Remark,
+            //                    Type: data.Type,
+            //                    JsonSetting: JSON.stringify(data)
+            //                };
+            //                questionDatas.push(questionData);
+            //            });
+            //            surveyData.QuestionDatas = questionDatas;
+
+
+
+            //            surveyData.LinkQuestions = _this.LinkQuestions;
+
+
+            //            return surveyData;
+            //        },
+            //        Save() {
+            //            var _this = this;
+
+            //            var MainForm = $('#MainForm').valid();
+            //            var QuestionForm = $('#QuestionForm').valid();
+
+
+            //            if (!QuestionForm) {
+            //                openWarningDialog("題目設計-有欄位未填寫", 10);
+            //                return;
+            //            }
+
+            //            if (!MainForm) {
+            //                openWarningDialog("問卷設定-有欄位未填寫", 10);
+
+            //            }
+
+            //            if (!MainForm || !QuestionForm) {
+
+            //                return;
+            //            }
+
+
+
+            //            SmartMessageBox({
+            //                title: "警告",
+            //                message: "確定要發布問卷嗎?",
+            //                callback(res) {
+            //                    if (res) {
+            //                        _this.ReturnAjax(
+            //                            "Api/Admin/SaveSurvey.ashx",
+            //                            {
+            //                                "SurveyData": encodeURIComponent(JSON.stringify(_this.SurveyDataProcess())),
+            //                            },
+            //                            function (result) {
+
+            //                                var surveyId = result.Data;
+            //                                _this.SurveyData.Id = surveyId;
+
+            //                                _this.Page = 4;
+            //                            },
+            //                            "IsLoading"
+            //                        )
+            //                    }
+            //                }
+            //            })
+
+            //        },
+            //        Preview() {
+            //            var _this = this;
+
+            //            _this.ReturnAjax(
+            //                "Api/Admin/SaveTempSurvey.ashx",
+            //                {
+            //                    "SurveyData": encodeURIComponent(JSON.stringify(_this.SurveyDataProcess())),
+            //                },
+            //                function (result) {
+            //                    var surveyId = result.Data;
+            //                    window.open(master.RootUrl + "Admin/Preview.aspx?Id=" + surveyId)
+            //                },
+            //                "IsLoading"
+
+            //            )
+
+
+
+            //        },
+            //        ReturnAjax(url, data, callback, loadingName) {
+            //            var _this = this;
+            //            if (loadingName == undefined) loadingName = 'IsLoading';
+            //            return $.ajax({
+            //                url: master.RootUrl + url,
+            //                type: "POST",
+            //                async: true,
+            //                cache: false,
+            //                data: data,
+            //                dataType: 'json',
+            //                //之前
+            //                beforeSend() {
+            //                    _this[loadingName] = true;
+            //                },
+            //                //成功
+            //                success: function (result) {
+            //                    if (result.StatusCode == 200) {
+            //                        callback(result);
+            //                    } else {
+            //                        openWarningDialog(result.StatusCode + ' : ' + result.StatusMsg);
+            //                        console.error(result.StatusExceptionMsg);
+            //                    }
+            //                },
+            //                //錯誤
+            //                error: function (xhr, textStatus, errorThrown) {
+            //                    openWarningDialog(xhr.status + ' : ' + xhr.statusText);
+            //                    console.error(xhr.responseText);
+            //                },
+            //                //之後
+            //                complete: function () {
+            //                    _this[loadingName] = false;
+            //                },
+            //            });
+            //        },
+            //        WatchNumber() {
+            //            //var tempIndex = 0;
+            //            var number1 = 1;
+            //            this.LeftItems.forEach((data, index) => {
+            //                data.Number = " ";
+            //                //有縮排
+            //                if (data.IndentNeed) {
+            //                    var preItem = this.LeftItems[index - 1];
+            //                    if (preItem === undefined || !preItem.IndentNeed) {
+            //                        data.Number = 1;
+            //                    }
+            //                    else if (preItem.IndentNeed) {
+            //                        data.Number = preItem.Number + 1;
+            //                    }
+            //                }
+            //                else if (data.Type == 7 || data.Type == 8) {
+            //                    //data.Number = " ";
+
+            //                }
+            //                //沒縮排
+            //                else {
+            //                    data.Number = number1;
+            //                    number1++;
+            //                }
+            //            });
+
+            //        },
+            //        ItemCopy(leftitems, item, index) {
+            //            var copyItem = JSON.parse(JSON.stringify(item));
+            //            copyItem.Id = this.Guid();
+            //            leftitems.splice(index + 1, 0, copyItem);
+            //        },
+            //        ItemDelete(leftitems, index) {
+            //            var _this = this;
+            //            SmartMessageBox({
+            //                title: "警告",
+            //                message: "你確定要刪除嗎?",
+            //                callback(res) {
+            //                    if (res) {
+            //                        var data = leftitems[index];
+            //                        var LinkQuestions = [];
+            //                        _this.LinkQuestions.forEach(e => {
+
+            //                            if (e.Id != data.Id) {
+            //                                LinkQuestions.push(e)
+            //                            }
+            //                        });
+            //                        _this.LinkQuestions = LinkQuestions;
+
+            //                        leftitems.splice(index, 1)
+            //                    }
+            //                }
+            //            })
+            //        },
+            //        NumberToLetter(number) {
+            //            const letters = 'abcdefghijklmnopqrstuvwxyz';
+
+            //            if (number <= 26) {
+            //                return letters[number - 1];
+            //            } else {
+            //                let result = '';
+
+            //                while (number > 0) {
+            //                    const remainder = (number - 1) % 26;
+            //                    result = letters[remainder] + result;
+            //                    number = Math.floor((number - 1) / 26);
+            //                }
+
+            //                return result;
+            //            }
+            //        },
+            //        TopicOptionUp(topicOptions, index) {
+            //            if (index != 0) {
+
+            //                let item = topicOptions.splice(index, 1)[0];
+            //                topicOptions.splice(index - 1, 0, item);
+            //            }
+            //        },
+            //        TopicOptionDown(topicOptions, index) {
+            //            var length = topicOptions.length;
+            //            if (index != length - 1) {
+            //                let item = topicOptions.splice(index, 1)[0];
+            //                topicOptions.splice(index + 1, 0, item);
+            //            }
+            //        },
+            //        TopicOptionPlus(topicOptions, index) {
+            //            var item = {
+            //                Title: "",
+            //                Id: this.Guid()
+            //            };
+            //            topicOptions.splice(index + 1, 0, item);
+            //        },
+            //        TopicOptionMinus(item, index) {
+            //            if (item.TopicOptions.length > 1) {
+
+            //                var option = item.TopicOptions[index];
+            //                var linkQuestionIndex = this.LinkQuestions.findIndex(e => e.Id == item.Id && e.OptionId == option.Id);
+            //                if (linkQuestionIndex != -1) {
+            //                    this.LinkQuestions.splice(linkQuestionIndex, 1)
+            //                }
+
+            //                item.TopicOptions.splice(index, 1)
+            //            }
+
+            //        },
+            //        AllowDrop(event) {
+            //            event.preventDefault();
+            //        },
+            //        RightDrag(event, item) {
+            //            console.log(-1);
+            //            this.highlightedIndex = -1;
+            //            item.block = "right";
+            //            item.Id = this.Guid();
+            //            event.dataTransfer.setData("text", JSON.stringify(item));
+            //        },
+            //        RightDrop(event) {
+            //            event.preventDefault();
+            //        },
+            //        LeftDrag(event, item, index) {
+            //            item.block = "left"
+            //            item.index = index
+            //            event.dataTransfer.setData("text", JSON.stringify(item));
+            //        },
+            //        LeftDrop(event) {
+            //            event.preventDefault();
+            //            var itemData = JSON.parse(event.dataTransfer.getData("text"));
+            //            var newItem = itemData;
+
+            //            //從右邊拖到左邊
+            //            if (itemData.block == "right" && ($(event.target).hasClass("left") || $(event.target).parents(".left").length > 0)) {
+
+
+            //                newItem.Title = "";
+            //                newItem.Type = newItem.value;
+            //                newItem.Remark = "";
+            //                newItem.RequestNeed = false;
+            //                newItem.RemarkNeed = false;
+            //                newItem.VerifyNeed = false;
+            //                newItem.IndentNeed = false;
+            //                //其他
+            //                newItem.Other = {
+            //                    Need: false,
+            //                    Title: "其他",
+
+            //                };
+            //                //以上皆非
+            //                newItem.None = {
+            //                    Need: false,
+            //                    Title: "其他",
+
+            //                };
+            //                newItem.UploadSetting = {
+            //                    FileSize: 5,
+            //                    FileFormatRestrictions: true,
+            //                    Word: true,
+            //                    Image: true,
+            //                    PPT: true,
+            //                    Video: true,
+            //                    Excel: true,
+            //                    Audio: true
+            //                }
+
+            //                newItem.TopicOptions = [];
+            //                if (newItem.Type == 3 || newItem.Type == 4) {
+            //                    newItem.TopicOptions.push({
+            //                        Title: "",
+            //                        Id: this.Guid()
+            //                    })
+            //                }
+
+            //                if (this.highlightedIndex === -1) {
+            //                    this.LeftItems.push(newItem);
+            //                } else {
+            //                    this.LeftItems.splice(this.highlightedIndex, 0, newItem);
+            //                }
+
+            //            }
+            //            else if (itemData.block == "left" && ($(event.target).hasClass("left") || $(event.target).parents(".left").length > 0)) {
+            //                var oldIndex = this.LeftItems.findIndex(element => element.Id == newItem.Id);
+
+            //                if (oldIndex != this.highlightedIndex) {
+            //                    var element = this.LeftItems.splice(oldIndex, 1);  // 移除一个元素，返回移除的元素
+            //                    this.LeftItems.splice(this.highlightedIndex, 0, element[0]);
+            //                }
+
+
+            //            }
+            //        },
+            //        DragEnter(event, index) {
+            //            event.preventDefault();
+            //            console.log(index);
+            //            this.highlightedIndex = index;
+            //        },
+            //        DragLeave(event, index) {
+            //            event.preventDefault();
+            //            //console.log(-1);
+            //            //this.highlightedIndex = -1;
+            //        },
+            //        Cancel() {
+
+            //            this.IsShow = false;
+            //        },
+            //        Afterleave() {
+            //            surveyList.GetSurveyTableDraw();
+            //            surveyList.IsShow = true;
+            //        },
+            //        OpenResultLink() {
+            //            window.open(master.RootUrl + "Admin/Result/Review.aspx?Id=" + this.SurveyData.Id);
+            //        },
+            //        Guid() {
+            //            function s4() {
+            //                return Math.floor((1 + Math.random()) * 0x10000)
+            //                    .toString(16)
+            //                    .substring(1);
+            //            }
+            //            return (
+
+            //                s4() +
+            //                s4() +
+            //                '-' +
+            //                s4() +
+            //                '-' +
+            //                s4() +
+            //                '-' +
+            //                s4() +
+            //                '-' +
+            //                s4() +
+            //                s4() +
+            //                s4()
+            //            );
+            //        }
+            //    }
+            //})
+
+        });
+
+
+    </script>
+    }

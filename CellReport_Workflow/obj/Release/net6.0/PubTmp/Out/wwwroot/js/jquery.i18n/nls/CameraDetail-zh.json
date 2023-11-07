@@ -1,0 +1,16 @@
+{
+    "Camera Detail": "攝相機訊息",
+    "Save": "儲存",
+    "Delete": "刪除",
+    "camera name": "攝相機名稱",
+    "Camera Type": "攝相機類型",
+    "Server": "伺服器",
+    "Image Size": "圖片尺寸",
+    "Width": "寬",
+    "Height": "高",
+    "Description": "描述",
+    "Stream Url": "串流網址",
+    "Snapshot Url": "截圖網址",
+    "Camera IP": "攝相機 IP",
+    "ComPort": "串列埠"
+}

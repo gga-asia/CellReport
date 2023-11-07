@@ -1,0 +1,330 @@
+[
+  {
+    "Id": "0",
+    "cus_ct_id": "ASC10205110009",
+    "datetime": "2020/03/25 14:53",
+    "emp_id": "G123",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "1",
+    "cus_ct_id": "ASC10711210003",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "2",
+    "cus_ct_id": "ASM10712250011",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "3",
+    "cus_ct_id": "ASM10712250011",
+    "datetime": "2020/03/25 14:57",
+    "emp_id": "G789",
+    "stage": "品質主管複核",
+    "state": "簽核",
+    "remark": "無"
+  },
+  {
+    "Id": "4",
+    "cus_ct_id": "ASM10804060005",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "5",
+    "cus_ct_id": "ASM10804060005",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "品質主管複核",
+    "state": "簽核",
+    "remark": ""
+  },
+  {
+    "Id": "6",
+    "cus_ct_id": "ASM10804060005",
+    "datetime": "2020/03/25 14:57",
+    "emp_id": "G234",
+    "stage": "Lab主管複核",
+    "state": "簽核",
+    "remark": ""
+  },
+  {
+    "Id": "7",
+    "cus_ct_id": "ASC10805130013",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "8",
+    "cus_ct_id": "ASC10811200064",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "9",
+    "cus_ct_id": "ASC10903040016",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "10",
+    "cus_ct_id": "ASC10903040016",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "品質主管複核",
+    "state": "簽核",
+    "remark": ""
+  },
+  {
+    "Id": "11",
+    "cus_ct_id": "ASC10903260033",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "12",
+    "cus_ct_id": "MSC09410010001",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "13",
+    "cus_ct_id": "MSC09410080002",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "14",
+    "cus_ct_id": "MSC09410080002",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "品質主管複核",
+    "state": "簽核",
+    "remark": ""
+  },
+  {
+    "Id": "15",
+    "cus_ct_id": "MSC09410200007",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "16",
+    "cus_ct_id": "MSC09410200007",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "品質主管複核",
+    "state": "簽核",
+    "remark": ""
+  },
+  {
+    "Id": "17",
+    "cus_ct_id": "MSC09410200007",
+    "datetime": "2020/03/25 14:57",
+    "emp_id": "G234",
+    "stage": "Lab主管複核",
+    "state": "簽核",
+    "remark": ""
+  },
+  {
+    "Id": "18",
+    "cus_ct_id": "MSC09410290010",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "19",
+    "cus_ct_id": "MH10605080062",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "20",
+    "cus_ct_id": "MST10611120494",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "21",
+    "cus_ct_id": "MST10611120494",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "品質主管複核",
+    "state": "",
+    "remark": ""
+  },
+
+  {
+    "Id": "22",
+    "cus_ct_id": "MST10705170237",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "23",
+    "cus_ct_id": "MST10705170237",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "品質主管複核",
+    "state": "簽核",
+    "remark": ""
+  },
+  {
+    "Id": "24",
+    "cus_ct_id": "MST10705170237",
+    "datetime": "2020/03/25 14:57",
+    "emp_id": "G234",
+    "stage": "Lab主管複核",
+    "state": "簽核",
+    "remark": ""
+  },
+  {
+    "Id": "25",
+    "cus_ct_id": "MST10705170237",
+    "datetime": "2020/03/25 14:59",
+    "emp_id": "G234",
+    "stage": "報告釋出",
+    "state": "簽核",
+    "remark": ""
+  },
+  {
+    "Id": "26",
+    "cus_ct_id": "MST10706210291",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "27",
+    "cus_ct_id": "MDW10801020001",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "28",
+    "cus_ct_id": "MDW10801090008",
+    "datetime": "2020/03/25 14:55",
+    "emp_id": "G456",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "29",
+    "cus_ct_id": "MDW10801090008",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "品質主管複核",
+    "state": "簽核",
+    "remark": ""
+  },
+
+
+
+  {
+    "Id": "30",
+    "cus_ct_id": "N10905160246",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "31",
+    "cus_ct_id": "N10905160246",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "品質主管複核",
+    "state": "簽核",
+    "remark": ""
+  },
+  {
+    "Id": "32",
+    "cus_ct_id": "HN10905170294",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "33",
+    "cus_ct_id": "HN10905170294",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "品質主管複核",
+    "state": "簽核",
+    "remark": ""
+  },
+  {
+    "Id": "34",
+    "cus_ct_id": "N10905180248",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  },
+  {
+    "Id": "35",
+    "cus_ct_id": "HN10905180296",
+    "datetime": "2020/03/25 14:56",
+    "emp_id": "G789",
+    "stage": "Lab資料送出",
+    "state": "",
+    "remark": ""
+  }
+]

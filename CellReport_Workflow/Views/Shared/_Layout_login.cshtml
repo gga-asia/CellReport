@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-tap-highlight" content="no" />
+
+
+    <link href="~/css/vendors.bundle.css" rel="stylesheet" />
+    <link href="~/css/app.bundle.css" rel="stylesheet" />
+    <link href="~/css/page-login.css" rel="stylesheet" />
+    <link href="~/css/toastr.css" rel="stylesheet" />
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+    </style>
+
+</head>
+<body>
+    @RenderBody()
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/js/vendors.bundle.js"></script>
+    <script src="~/js/app.bundle.js"></script>
+    <script src="~/js/vue.js"></script>
+    <script src="~/js/toastr.js"></script>
+    <script src="~/js/publicscript.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

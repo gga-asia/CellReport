@@ -1,0 +1,356 @@
+﻿@{
+    Layout = "_Layout1";
+}
+
+<link href="~/css/quill.css" rel="stylesheet" />
+<script src="~/js/katex.min.js"></script>
+<script src="~/js/highlight.min.js"></script>
+<script src="~/js/quill.js"></script>
+<link href="~/css/other.css" rel="stylesheet" />
+
+<div class="row">
+
+    <div id="reportInfo" class="col-lg-12 col-md-12">
+
+        <div class="panel"
+             data-panel-collapsed="false"
+             data-panel-fullscreen="false"
+             data-panel-close="false"
+             data-panel-locked="false"
+             data-panel-refresh="false"
+             data-panel-custombutton="false"
+             data-panel-reset="false"
+             data-panel-color="false">
+            <div class="panel-hdr  bg-fusion-500">
+                <h2>
+                    {{Cus_CT_ID}}
+                </h2>
+                @* <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
+                <label class="btn btn-info waves-effect waves-themed">
+                <input type="radio" name="options" id="option1" checked="checked">上一筆
+                </label>
+                <label class="btn btn-info waves-effect waves-themed active">
+                <input type="radio" name="options" id="option3"> 下一筆
+                </label>
+                </div>*@
+                <div class="col-md-8" id="reportStu">
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                        <div class="rounded-plus bg-fusion-50 height-1 bg-faded cent" style="margin:10px; width:20%">
+                            <p style="margin:0 !important" class="stuP">Lab送出資料</p>
+                        </div>
+                        <i class="ni ni-chevron-right fa-2x"></i>
+                        <div class="rounded-plus bg-fusion-50 height-1 bg-faded cent" style="margin:10px; width:20%">
+                            <p style="margin:0 !important" class="stuP">品質主管複核</p>
+                        </div>
+                        <i class="ni ni-chevron-right fa-2x"></i>
+                        <div class="rounded-plus bg-fusion-50  height-1 bg-subtlelight cent" style="margin:10px; width:20%">
+                            <p style="margin:0 !important" class="stuP">Lab主管複核</p>
+                        </div>
+                        <i class="ni ni-chevron-right fa-2x"></i>
+                        <div class="rounded-plus bg-fusion-50  height-1 bg-faded cent" style="margin:10px; width:20%">
+                            <p style="margin:0 !important" class="stuP">簽核完成</p>
+                        </div>
+                        <i class="ni ni-chevron-right fa-2x"></i>
+                        <div class="rounded-plus bg-fusion-50  height-1 bg-faded cent" style="margin:10px; width:20%">
+                            <p style="margin:0 !important" class="stuP">報告釋出</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-container show ">
+                <div class="row p-2">
+                    <div class="col-12">
+                        <div class="form-row" style="font-size: 14px;">
+                            <div class="col-12" style="display:flex">
+                                <div class="col-md-12">
+                                    <div style="display:flex; ">
+                                        @*<div style="width:50%;  align-items: center; justify-content: center;">
+
+                                        <p>姓名: {{name}}</p>
+                                        <p>檢體編號: {{Cus_CT_ID}}</p>
+                                        </div>
+                                        <div style="width:50%;  align-items: center; justify-content: center;">
+                                        <p>報告日: {{ReportDate}}</p>
+                                        <p>狀態: {{Status}}</p>
+                                        </div>*@
+
+                                        <table id="123" class="w-100 mt-2 mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th><p>姓名: {{name}}</p></th>
+                                                    <th><p>檢體編號: {{Cus_CT_ID}}</p></th>
+                                                    @{
+                                                        if (ViewBag.Id.ToString().StartsWith("N") || ViewBag.Id.ToString().StartsWith("HN"))
+                                                        {
+                                                            <th><p>寶寶生日: {{ReportDate}}</p></th>
+                                                        }
+                                                        else
+                                                        {
+                                                            <th><p>報告日: {{ReportDate}}</p></th>
+                                                        }
+                                                    }
+                                                    <th><p>狀態: {{Status}}</p></th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="frame-wrap w-100 pr-2 pl-2" style="margin-bottom:5px">
+                            <div class="accordion" id="accordionExample">
+                                <div class="card">
+                                    <div class="card-header" id="headingOne">
+                                        <a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                            查看報告
+                                            <span class="ml-auto">
+                                                <span class="collapsed-reveal">
+                                                    <i class="fal fa-minus-circle text-danger"></i>
+                                                </span>
+                                                <span class="collapsed-hidden">
+                                                    <i class="fal fa-plus-circle text-success"></i>
+                                                </span>
+                                            </span>
+                                        </a>
+
+                                        @*<iframe src="~/file/ffdp112_e_ffdp11203212.pdf" style="height:1200px; width:100%"></iframe>*@
+                                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample" style="">
+                                            <div class="card-body">
+                                                <iframe src="~/file/@{
+                                                    @ViewBag.Id
+}.PDF" style="height:1200px; width:100%"></iframe>
+                                                <iframe src="~/file/@{
+                                                    @ViewBag.Id
+}_HLACheck_C.pdf" style="height:1200px; width:100%" class="HLA"></iframe>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header" id="headingTwo">
+                                            <a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                報告備份
+                                                <span class="ml-auto">
+                                                    <span class="collapsed-reveal">
+                                                        <i class="fal fa-minus-circle text-danger"></i>
+                                                    </span>
+                                                    <span class="collapsed-hidden">
+                                                        <i class="fal fa-plus-circle text-success"></i>
+                                                    </span>
+                                                </span>
+                                            </a>
+                                        </div>
+                                        <div id="collapseTwo" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample" style="">
+                                            <div class="card-body">
+                                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header" id="heading3">
+                                            <a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                                簽核紀錄
+                                                <span class="ml-auto">
+                                                    <span class="collapsed-reveal">
+                                                        <i class="fal fa-minus-circle text-danger"></i>
+                                                    </span>
+                                                    <span class="collapsed-hidden">
+                                                        <i class="fal fa-plus-circle text-success"></i>
+                                                    </span>
+                                                </span>
+                                            </a>
+                                        </div>
+                                        <div id="collapse3" class="collapse" aria-labelledby="heading3" data-parent="#accordionExample">
+                                            <div class="card-body">
+                                                <table id="RecordTable" class="table table-bordered table-hover table-striped w-100">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>時間</th>
+                                                            <th>員編</th>
+                                                            <th>階段</th>
+                                                            <th>狀態</th>
+                                                            <th>備註</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 pt-0 pr-3 pl-3" style="height: 100px">
+                                <label class="form-label" for="example-textarea"> 簽核建議:</label>
+                                <textarea class="form-control" id="example-textarea" rows="1"></textarea>
+                                <div class="cent" style="display:flex">
+                                    <button type="button" class="btn btn-xs btn-info waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="Sign" id="sig">簽核</button>
+                                    <button type="button" class="btn btn-xs btn-danger waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="Reject" id="unsig">反簽核</button>
+                                    <button type="button" class="btn btn-xs btn-info waves-effect waves-themed mr-1 mb-1 mt-1" id="release">釋出</button>
+                                    <button type="button" class="btn btn-xs btn-secondary waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="last">上一筆</button>
+                                    <button type="button" class="btn btn-xs btn-secondary waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="next">下一筆</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    @section Scripts{
+        <script>
+            var report_Info = new Vue({
+                el: "#reportInfo",
+                data: {
+                    RecordTable: {},
+                    name: "",
+                    Cus_CT_ID: "",
+                    ReportDate: "",
+                    Status: "",
+                    //showInput: false
+                },
+                mounted() {
+                   
+                    $.ajax({
+                        url: `@Url.Content("~/Report/Details")`,
+                        type: "post",
+                        dataType: "json",
+                        data: { Id: '@ViewBag.Id' }
+                    })
+                        .done(data => {
+                            console.log(data);
+                            report_Info.name = data.motheR_NAME;
+                            report_Info.Cus_CT_ID = data.cus_CT_ID;
+                            report_Info.ReportDate = data.reportDate;
+                            report_Info.Status = data.status;
+                            if (data.hla != "Y") {
+                                $(".HLA").css("display", "none");
+                            }
+                            const Stu = $(`#reportStu p:contains('${data.status}')`);
+                            Stu.parent("div").css("background-color", " #1DC9B7")
+                            Stu.parent("div").prevAll("div").css("background-color", "#1DC9B7")
+                            //Stu.parent("div").css("background-color", " #3276b1")
+                            //Stu.parent("div").siblings("div").css("background-color", "#1DC9B7")
+                            //$("iframe").attr("src", "~/file/MDW10801020001.PDF");
+                            if (data.status != "簽核完成"){
+                                $("#release").css("display","none");
+                            }
+                            else{
+                                $("#sig").css("display", "none")
+                            }
+                            if (data.status == "報告釋出") {
+                                $("#sig, #unsig").css("display", "none")
+                            }
+                        });
+
+                    this.InitRecordTable();
+                },
+                methods: {
+                    next() {
+                        console.log(report_Info.Cus_CT_ID);
+                        window.location.href = `@Url.Content("~/Home/Detail")?Id=${report_Info.Cus_CT_ID}&type=next`;
+                    },
+                    last() {
+                        console.log(report_Info.Cus_CT_ID);
+                        window.location.href = `@Url.Content("~/Home/Detail")?Id=${report_Info.Cus_CT_ID}&type=last`;
+                    },
+                    Sign() {
+                        $.ajax({
+                            url: `@Url.Content("~/Home/Details")`,
+                            type: "post",
+                            dataType: "json",
+                            data: { Id: '@ViewBag.Id' }
+                        })
+                            .done(data => {
+                                console.log(data);
+                            });
+                    },
+                    Reject() {
+                        $.ajax({
+                            url: `@Url.Content("~/Home/Details")`,
+                            type: "post",
+                            dataType: "json",
+                            data: { Id: '@ViewBag.Id' }
+                        })
+                            .done(data => {
+                                console.log(data);
+                            });
+                    },
+                    InitRecordTable() {
+                        var _this = this;
+                        _this.RecordTable = $("#RecordTable").DataTable({
+                            searching: false,
+                            autoWidth: false,
+                            //scrollX: true,
+                            //lengthChange: false,
+                            //pageLength: 10,
+                            responsive: false,
+                            deferRender: true,
+                            ordering: true,
+                            order: [[0, 'asc']],
+                            columnDefs: [
+                            ],
+                            //lengthMenu: [10],
+                            language: {
+                                url: `@Url.Content("~/lang/dataTables/tw.json")`
+                            },
+                            dom: `<'row'<'col-sm-12'tr>>`,
+                            columns: [
+                                {
+                                    data: "datetime",
+                                    render: function (data) {
+                                        if (data != "") {
+                                            return moment.utc(data).local().format('YYYY/MM/DD HH:mm:ss');
+                                        }
+                                        return "";
+                                    }
+                                },
+                                {
+                                    data: "emp_id"
+                                },
+                                {
+                                    data: "stage",
+                                },
+                                {
+                                    data: "state",
+                                },
+                                {
+                                    data: "remark",
+                                    sortable: false
+                                },
+                            ],
+                            ajax: {
+                                url: `@Url.Content("~/Home/DetailsSingeRecord")`,
+                                dataSrc: "",
+                                async: true,
+                                cache: false,
+                                type: "POST",
+                                data: { Id: '@ViewBag.Id' },
+                                beforeSend() {
+                                    //_this.ContantUsApps = [];
+                                }
+                            }
+                            //,
+                            //createdRow(row, data, index) {
+
+                            //    var hidden = $('<input/>', {
+                            //        type: 'hidden',
+                            //        value: data.cus_CT_ID,
+                            //        class: 'hiddenDemoData'
+                            //    });
+                            //    $('td', row).eq(0).append(hidden);
+
+                            //}
+                        });
+
+                    },
+                }
+            })
+        </script>
+    }

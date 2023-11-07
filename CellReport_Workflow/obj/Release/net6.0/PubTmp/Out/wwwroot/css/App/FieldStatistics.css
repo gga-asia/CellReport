@@ -1,0 +1,121 @@
+﻿
+#total-content {
+    overflow: -moz-hidden-unscrollable;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    max-height: 95vh;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+    #total-content::-webkit-scrollbar {
+        display: none;
+    }
+
+.headTitle {
+    font-size: 5vw;
+    text-align: center;
+}
+
+.headTime {
+    font-size: 4vw;
+    text-align: center;
+}
+
+.headDate {
+    height: 100%;
+    font-size: 4vw;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.toolPosition {
+    position: fixed;
+    top: 1vh;
+    left: 1vh;
+    z-index: 999;
+}
+
+/*群組統計DIV*/
+#groupStatisticsDiv {
+    min-height: 50vh;
+}
+
+    #groupStatisticsDiv row > div {
+        max-height: 20vh;
+    }
+
+    #groupStatisticsDiv table {
+        font-family: Microsoft JhengHei,Verdana;
+        background-color: #FFFFFF;
+        text-align: center;
+        color: #212529;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    #groupStatisticsDiv thead {
+        background-color: #336699;
+        color: #FFFFFF;
+        font-size: 3vh;
+    }
+
+    #groupStatisticsDiv tbody {
+        font-size: 2.5vh;
+    }
+
+        #groupStatisticsDiv tbody td {
+            width: 33%;
+            border: 1px solid #e9e9e9;
+        }
+
+
+/*近期事件*/
+#eventListTable {
+    font-family: Microsoft JhengHei,Verdana;
+    background-color: #FFFFFF;
+    font-size: 2.5vh;
+    text-align: center;
+    color: #212529;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+    #eventListTable thead {
+        background-color: #BCBCBC;
+        color: #212529;
+        border: 1px solid #e9e9e9;
+    }
+
+    #eventListTable img {
+        width: 7vw;
+        height: 7vw;
+    }
+
+    #eventListTable td {
+        vertical-align: middle;
+        padding-top: 0.2rem;
+        padding-bottom: 0.2rem;
+        border: 1px solid #e9e9e9;
+    }
+
+    #eventListTable .warnRow td {
+        color: red;
+    }
+
+.numberPeople {
+    font-size: 2.5vw;
+    font-family: Microsoft JhengHei,Verdana;
+}
+
+.text-ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.columnStyle {
+    vertical-align: middle !important;
+    text-align: center !important;
+    font-size: 16px;
+}

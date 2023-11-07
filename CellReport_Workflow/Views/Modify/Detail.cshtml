@@ -1,0 +1,507 @@
+﻿@{
+    Layout = "_Layout1";
+}
+
+<link href="~/css/quill.css" rel="stylesheet" />
+<script src="~/js/katex.min.js"></script>
+<script src="~/js/highlight.min.js"></script>
+<script src="~/js/quill.js"></script>
+<link href="~/css/other.css" rel="stylesheet" />
+
+<div class="row">
+
+    <div id="reportInfo" class="col-lg-12 col-md-12">
+
+        <div class="panel"
+             data-panel-collapsed="false"
+             data-panel-fullscreen="false"
+             data-panel-close="false"
+             data-panel-locked="false"
+             data-panel-refresh="false"
+             data-panel-custombutton="false"
+             data-panel-reset="false"
+             data-panel-color="false">
+            <div class="panel-hdr  bg-fusion-500">
+                <p id="ModifyId" style="display:none">{{id}}</p>
+                @*<h2>
+                報告修正申請  :  {{Cus_CT_ID}}
+                </h2>*@
+                <table id="123" class="w-100 mt-2 mb-0" style="border-collapse: unset">
+                    <thead>
+                        <tr>
+                            <th><p style="margin:0 !important">  報告修正申請 : {{Cus_CT_ID}}</p></th>
+                            <th><p style="margin:0 !important">完成日: {{ReportDate}}</p></th>
+                            <th><p style="margin:0 !important">狀態: {{Status}}</p></th>
+                        </tr>
+                        <tr>
+                            @*<th><p>申請原因: 客戶姓名修正，原為xxx修正為xxx。</p></th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel-container show ">
+                <div class="row p-2">
+                    <div class="col-12">
+                        <div class="form-row" style="font-size: 14px;">
+                            <div class="col-12" style="display:flex">
+                                <div class="col-md-12">
+                                    <div style="display:flex; ">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="form-row" style="font-size: 14px;">
+                            <div class="col-12" style="display:flex">
+                                <div class="col-md-12">
+                                    <div style="display:flex; ">
+                                        <table id="1234" class="table table-bordered table-hover table-striped w-50" style="margin:5px">
+                                            <thead>
+                                                <tr role="row">
+                                                    <th class="w-25"></th>
+                                                    <th class="w-75">申請訊息</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>申請人</td>
+                                                    <td>{{apply_By}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>申請時間</td>
+                                                    <td>{{apply_Date}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>原因</td>
+                                                    <td>{{reson}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table id="12345" class="table table-bordered table-hover table-striped w-50" style="margin:5px">
+                                            <thead>
+                                                <tr role="row">
+                                                    <th class="w-25"></th>
+                                                    <th class="w-75">實驗室主管回覆</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>實驗室主管</td>
+                                                    <td>{{reply_By}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>回覆時間</td>
+                                                    <td>{{reply_Date}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>回覆</td>
+                                                    <td>{{reply}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>回覆說明</td>
+                                                    <td>{{reply_remark}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="col-12 pt-0 pr-3 pl-3" style="height: 100px; display:none;" id="Answer">
+                            <label class="form-label" for="example-textarea"> 回覆:</label>
+                            <textarea class="form-control" id="example-textarea" rows="1" v-model.trim="reply_remark_keyIn"></textarea>
+                            <div class="cent" style="display:flex">
+                                <button type="button" class="btn btn-xs btn-secondary waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="Yes">同意</button>
+                                <button type="button" class="btn btn-xs btn-danger waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="No">不同意</button>
+                            </div>
+                        </div>
+                        <hr />
+                        <br />
+                        <br />
+                        <br />
+                        <div class="frame-wrap w-100 pr-2 pl-2" style="margin-bottom:5px">
+                            <div class="accordion" id="accordionExample">
+
+                                <div class="card">
+                                    <div class="card-header" id="headingTwo">
+                                        <a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                            查看報告
+                                            <span class="ml-auto">
+                                                <span class="collapsed-reveal">
+                                                    <i class="fal fa-minus-circle text-danger"></i>
+                                                </span>
+                                                <span class="collapsed-hidden">
+                                                    <i class="fal fa-plus-circle text-success"></i>
+                                                </span>
+                                            </span>
+                                        </a>
+                                        @*<iframe src="~/file/ffdp112_e_ffdp11203212.pdf" style="height:1200px; width:100%"></iframe>*@
+                                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample" style="">
+                                            <div class="card-body">
+                                                <iframe src="~/file/@{
+                                                                                                                    @ViewBag.Id
+}.PDF" style="height:1200px; width:100%"></iframe>
+                                                <iframe src="~/file/@{
+                                                                                                                    @ViewBag.Id
+}_HLACheck_C.pdf" style="height:1200px; width:100%" class="HLA"></iframe>
+                                            </div>
+                                        </div>
+                                        <div id="collapseTwo" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample" style="">
+                                            <div class="card-body">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header" id="heading3">
+                                            <a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                                簽核紀錄
+                                                <span class="ml-auto">
+                                                    <span class="collapsed-reveal">
+                                                        <i class="fal fa-minus-circle text-danger"></i>
+                                                    </span>
+                                                    <span class="collapsed-hidden">
+                                                        <i class="fal fa-plus-circle text-success"></i>
+                                                    </span>
+                                                </span>
+                                            </a>
+                                        </div>
+                                        <div id="collapse3" class="collapse" aria-labelledby="heading3" data-parent="#accordionExample">
+                                            <div class="card-body">
+                                                <table id="RecordTable" class="table table-bordered table-hover table-striped w-100">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>時間</th>
+                                                            <th>員編</th>
+                                                            <th>階段</th>
+                                                            <th>狀態</th>
+                                                            <th>備註</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-header" id="heading1">
+                                            <a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+                                                修正申請紀錄
+                                                <span class="ml-auto">
+                                                    <span class="collapsed-reveal">
+                                                        <i class="fal fa-minus-circle text-danger"></i>
+                                                    </span>
+                                                    <span class="collapsed-hidden">
+                                                        <i class="fal fa-plus-circle text-success"></i>
+                                                    </span>
+                                                </span>
+                                            </a>
+                                            <div id="collapse1" class="collapse" aria-labelledby="heading1" data-parent="#accordionExample">
+                                                <div class="card-body">
+                                                    <table id="ModifyTable" class="table table-bordered table-hover table-striped w-100">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>時間</th>
+                                                                <th>員編</th>
+                                                                <th>說明</th>
+                                                                <th>狀態</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        var report_Info = new Vue({
+            el: "#reportInfo",
+            data: {
+                RecordTable: {},
+                ModifyTable: {},
+                name: "",
+                Cus_CT_ID: "",
+                ReportDate: "",
+                Status: "",
+                ProductType: "",
+                ThisReson: "",
+
+                id: "",
+                apply_Date: "",
+                apply_By: "",
+                reson: "",
+                reply_Date: "",
+                reply_By: "",
+                reply: "",
+                reply_remark: "",
+                reply_remark_keyIn: ""
+
+                //showInput: false
+            },
+            mounted() {
+
+                $.ajax({
+                    url: `@Url.Content("~/Report/Details")`,
+                    type: "post",
+                    dataType: "json",
+                    data: { Id: '@ViewBag.Id' }
+                })
+                    .done(data => {
+                        console.log(data);
+                        report_Info.name = data.motheR_NAME;
+                        report_Info.Cus_CT_ID = data.cus_ct_id;
+                        report_Info.ReportDate = data.final_Date;
+                        report_Info.Status = data.stage;
+                        report_Info.ProductType = data.productType;
+
+                        if (data.hla != "Y") {
+                            $(".HLA").css("display", "none");
+                        }
+                    });
+
+
+                $.ajax({
+                    url: `@Url.Content("~/Modify/DetailModify")`,
+                    type: "post",
+                    dataType: "json",
+                    data: { Id: '@ViewBag.ModifyId' }
+                })
+                    .done(data => {
+                        console.log(data);
+                        report_Info.id = data.id;
+                        report_Info.apply_Date = data.apply_Date;
+                        report_Info.apply_By = data.apply_By;
+                        report_Info.reson = data.reson;
+
+                        report_Info.reply_By = data.reply_By;
+                        if (data.reply_Date == "") {
+                            report_Info.reply_Date = "--"
+                        }
+                        else {
+                            report_Info.reply_Date = data.reply_Date;
+                        }
+
+                        if (data.reply == "") {
+                            report_Info.reply = "--"
+                        }
+                        else {
+                            report_Info.reply = data.reply;
+                        }
+
+                        if (data.reply_remark == "") {
+                            report_Info.reply_remark = "--"
+                        }
+                        else {
+                            report_Info.reply_remark = data.reply_remark;
+                        }
+
+                        if (data.reply == "" && (DEPARTMENT == "細胞實驗室" || DEPARTMENT == "造血實驗室") && RANK == "部門主管"){
+                            $("#Answer").css("display","");
+                        }
+                    });
+
+                this.InitRecordTable();
+                this.InitModifyTable();
+            },
+            methods: {
+                Yes() {
+                    console.log(report_Info.id);
+                    console.log(report_Info.reply_remark_keyIn);
+                    $.ajax({
+                        url: `@Url.Content("~/Modify/Reply")`,
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            Id: report_Info.id ,
+                            reply: "同意",
+                            reply_remark: report_Info.reply_remark_keyIn
+                        }
+                    })
+                        .done(data => {
+                            console.log(data);
+                            if (data == "OK") {
+                                location.reload();
+                            }
+                            else {
+                                toastr.error("錯誤", data, {
+                                    timeOut: 0
+                                });
+                            }
+                        });
+                },
+                No() {
+                    console.log(report_Info.id);
+                    console.log(report_Info.reply_remark_keyIn);
+                    $.ajax({
+                        url: `@Url.Content("~/Modify/Reply")`,
+                        type: "post",
+                        dataType: "json",
+                        data: { 
+                            Id: report_Info.id ,
+                            reply: "不同意",
+                            reply_remark: report_Info.reply_remark_keyIn
+                        }
+                    })
+                        .done(data => {
+                            console.log(data);
+                            if (data == "OK") {
+                                location.reload();
+                            }
+                            else {
+                                toastr.error("錯誤", data, {
+                                    timeOut: 0
+                                });
+                            }
+                        });
+                },
+                //Sign() {
+                //    $.ajax({
+                //        url: `@Url.Content("~/Report/Details")`,
+                //        type: "post",
+                //        dataType: "json",
+                //        data: { Id: '@ViewBag.Id' }
+                //    })
+                //        .done(data => {
+                //            console.log(data);
+                //        });
+                //},
+                //Reject() {
+                //    $.ajax({
+                //        url: `@Url.Content("~/Report/Details")`,
+                //        type: "post",
+                //        dataType: "json",
+                //        data: { Id: '@ViewBag.Id' }
+                //    })
+                //        .done(data => {
+                //            console.log(data);
+                //        });
+                //},
+                InitModifyTable() {
+                    var _this = this;
+                    _this.ModifyTable = $("#ModifyTable").DataTable({
+                        searching: false,
+                        autoWidth: false,
+                        responsive: false,
+                        deferRender: true,
+                        ordering: true,
+                        order: [[0, 'asc']],
+                        columnDefs: [
+                        ],
+                        //lengthMenu: [10],
+                        language: {
+                            url: `@Url.Content("~/lang/dataTables/tw.json")`
+                        },
+                        dom: `<'row'<'col-sm-12'tr>>`,
+                        columns: [
+                            {
+                                data: "datetime",
+                                sortable: false,
+                                //render: function (data) {
+                                //    if (data != "") {
+                                //        return moment.utc(data).local().format('YYYY/MM/DD HH:mm:ss');
+                                //    }
+                                //    return "";
+                                //}
+                            },
+                            {
+                                data: "emp_Id",
+                                sortable: false
+                            },
+
+                            {
+                                data: "remark",
+                                sortable: false
+                            },
+                            {
+                                data: "status",
+                                sortable: false
+                            },
+                        ],
+                        ajax: {
+                            url: `@Url.Content("~/Modify/DetailsModifyRecord")`,
+                            dataSrc: "",
+                            async: true,
+                            cache: false,
+                            type: "POST",
+                            data: { Id: '@ViewBag.Id' },
+                            beforeSend() {
+                                //_this.ContantUsApps = [];
+                            }
+                        }
+                    });
+                },
+
+                InitRecordTable() {
+                    var _this = this;
+                    _this.RecordTable = $("#RecordTable").DataTable({
+                        searching: false,
+                        autoWidth: false,
+                        responsive: false,
+                        deferRender: true,
+                        ordering: true,
+                        order: [[0, 'asc']],
+                        columnDefs: [
+                        ],
+                        //lengthMenu: [10],
+                        language: {
+                            url: `@Url.Content("~/lang/dataTables/tw.json")`
+                        },
+                        dom: `<'row'<'col-sm-12'tr>>`,
+                        columns: [
+                            {
+                                data: "datetime",
+                                //render: function (data) {
+                                //    if (data != "") {
+                                //        return moment.utc(data).local().format('YYYY/MM/DD HH:mm:ss');
+                                //    }
+                                //    return "";
+                                //}
+                            },
+                            {
+                                data: "emp_id"
+                            },
+                            {
+                                data: "stage",
+                            },
+                            {
+                                data: "state",
+                            },
+                            {
+                                data: "remark",
+                                sortable: false
+                            },
+                        ],
+                        ajax: {
+                            url: `@Url.Content("~/Report/DetailsSingeRecord")`,
+                            dataSrc: "",
+                            async: true,
+                            cache: false,
+                            type: "POST",
+                            data: { Id: '@ViewBag.Id' },
+                            beforeSend() {
+                                //_this.ContantUsApps = [];
+                            }
+                        }
+                    });
+
+                },
+            }
+        })
+    </script>
+    }

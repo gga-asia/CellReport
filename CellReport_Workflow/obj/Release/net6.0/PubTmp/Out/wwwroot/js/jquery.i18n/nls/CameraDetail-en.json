@@ -1,0 +1,16 @@
+{
+    "Camera Detail": "Camera Detail",
+    "Save": "Save",
+    "Delete":"Delete",
+    "camera name": "camera name",
+    "Camera Type": "Camera Type",
+    "Server": "Server",
+    "Image Size": "Image Size",
+    "Width": "Width",
+    "Height": "Height",
+    "Description": "Description",
+    "Stream Url": "Stream Url",
+    "Snapshot Url": "Snapshot Url",
+    "Camera IP": "Camera IP",
+    "ComPort": "ComPort"
+}

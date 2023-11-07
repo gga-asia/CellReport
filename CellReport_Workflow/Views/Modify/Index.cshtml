@@ -1,0 +1,515 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Layout = "_Layout1";
+}
+
+<style>
+    #surveyTable tbody td {
+        vertical-align: middle;
+    }
+
+    .v-enter-active,
+    .v-leave-active {
+        transition: opacity 0.5s ease;
+    }
+
+    .v-enter-from,
+    .v-leave-to {
+        opacity: 0;
+    }
+
+
+    .ql-editor strong {
+        font-weight: bold;
+    }
+
+    .settingicon {
+        margin: 2px 3px 2px 3px;
+        padding: 6px;
+        border-radius: 2px;
+        min-width: 28px;
+        text-align: center;
+    }
+
+    .numberIcon {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        text-align: center;
+        border-radius: 3px;
+        cursor: pointer;
+        vertical-align: top;
+        position: relative;
+        padding-top: 6px;
+        font-size: 14px;
+        color: #fff;
+        margin-top: 4px;
+        background-color: #3276b1;
+    }
+
+    .bootbox-body {
+        font-size: 18px;
+    }
+
+    .rowIcon {
+        font-size: 18px;
+        margin: 4px;
+        color: rgb(75 75 75);
+        cursor: pointer;
+    }
+
+    .css-1vadu8l {
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: start;
+        justify-content: flex-start;
+        flex-flow: row nowrap;
+        margin-bottom: 16px;
+    }
+
+    .css-ba1496 {
+        border-radius: 4px;
+        border: 1px solid rgb(238, 238, 238);
+        color: rgb(61, 186, 144);
+        padding: 3px 8px;
+        margin-right: 8px;
+        font-size: 16px;
+        line-height: 1.5;
+        width: 100%;
+        background-color: rgb(250, 250, 250);
+    }
+
+    .css-1v8e8oy {
+        color: rgb(255, 255, 255);
+        font-size: 14px;
+        font-weight: 500;
+        padding: 6px 10px;
+        background-color: #3276b1;
+        transition: all 0.1s ease-in-out 0s;
+        border: none;
+        border-radius: 4px;
+        width: 124px;
+        text-align: center;
+        cursor: pointer;
+    }
+</style>
+
+<link href="~/css/quill.css" rel="stylesheet" />
+<script src="~/js/katex.min.js"></script>
+<script src="~/js/highlight.min.js"></script>
+<script src="~/js/quill.js"></script>
+
+<div class="row">
+
+    <div class="col-lg-12 col-md-12" id="surveyList" v-cloak>
+        <transition v-on:after-leave="Afterleave">
+            <div class="panel"
+                 v-show="IsShow"
+                 data-panel-collapsed="false"
+                 data-panel-fullscreen="false"
+                 data-panel-close="false"
+                 data-panel-locked="false"
+                 data-panel-refresh="false"
+                 data-panel-custombutton="false"
+                 data-panel-reset="false"
+                 data-panel-color="false">
+                <div class="panel-hdr  bg-fusion-500">
+                    <h2>
+                        <vue-button class="mr-2" icon="fa-search" color="info" v-on:click="Search">
+                            查詢
+                        </vue-button>
+                        <vue-button class="mr-2" icon="fa-redo" color="info" v-on:click="GetSurveyTableDraw">
+                            重新整理
+                        </vue-button>
+                        <vue-button icon="fa-redo" color="info" v-on:click="GetSurveyTableDraw" data-toggle="modal" data-target="#Search_Report" id="btn_search">
+                            報告修正申請
+                        </vue-button>
+                    </h2>
+                </div>
+                <div class="panel-container show ">
+                    <div class="row p-2">
+                        <div class="col-12">
+                            <div class="form-row" style="font-size: 14px;">
+                                <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.Id" v-on:keyup="GetSurveyTableList">
+                                    客戶代號
+                                </vue-input>
+                                <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.type" v-on:keyup="GetSurveyTableList">
+                                    報告類型
+                                </vue-input>
+                                @* <vue-select class="col-lg-3 col-md-3 mb-1" v-model="Filter.Status" v-on:change="GetSurveyTableList"
+                                v-bind:options="StatusOptions">
+                                簽核狀態
+                                </vue-select>*@
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <table id="surveyTable" class="table table-bordered table-hover table-striped w-100">
+                        <thead>
+                            <tr>
+                                <th>內容</th>
+                                <th>客戶代號</th>
+                                <th>修改申請日</th>
+                                <th>申請人</th>
+                                <th>申請修改原因</th>
+                                <th>狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+
+
+
+
+
+    <div class="modal bd-example-modal-lg" id="Search_Report" tabindex="-1" role="dialog" aria-labelledby="Search_EmpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="Search_EmpModalLabel">查詢報告(限已上傳的報告)</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="cancel1_22">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div style="display:flex;" class="cent">
+                        <input class="form-control" style="width:80%" id="i_search" v-model.trim="searchFilter.Id" />
+                        <button type="button" class="btn btn-secondary" id="Search" v-on:click="Search">查詢</button>
+                    </div>
+                    <table id="searchTable" class="table table-bordered table-hover table-striped w-100">
+                        @* <thead class="w-100">
+                        <tr>
+                        <th>選擇</th>
+                        <th>客戶代號</th>
+                        <th>姓名</th>
+                        <th>產品別</th>
+                        <th>簽核狀態</th>
+                        </tr>
+                        </thead>
+                        <tbody class="w-100">
+                        </tbody>*@
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+@section Scripts{
+    <script>
+
+        $(document).ready(() => {
+            $.validator.setDefaults({
+                ignore: []
+            });
+
+            var surveyList = new Vue({
+                el: "#surveyList",
+                data: {
+                    IsShow: true,
+                    SurveyTable: {},
+                    //StatusOptions: [
+                    //    { "text": "請選擇", "value": "" },
+                    //    { "text": "Lab送出資料", "value": 0 },
+                    //    { "text": "品質主管複核", "value": 1 },
+                    //    { "text": "Lab主管複核", "value": 2 },
+                    //    { "text": "簽核", "value": 3 }
+                    //],
+                    Filter: {
+                        Id: "",
+                        type: "",
+                        Status: "",
+                    }
+                },
+                components: {
+                    loading: VueLoading
+                },
+                mounted() {
+                    $.ajax({
+                        url: `@Url.Content("~/Modify/Index")`,
+                        type: "post",
+                        dataType: "json",
+                        //data:
+                    })
+                        .done(data => {
+                            console.log(data);
+                        });
+                    this.InitSurveyTable();
+                },
+                methods: {
+                    Search() {
+                        surveyContent.ResetData();
+                        this.IsShow = false;
+                    },
+                    Edit(e) {
+                        SmartMessageBox({
+                            title: "警告",
+                            message: "您確定要編輯問卷嗎？ 您的修改將影響回收資料的準確性",
+                            callback(res) {
+                                if (res) {
+                                    var id = $(e.currentTarget).siblings("input.hiddenDemoData").val();
+                                    surveyContent.GetSurvey(id);
+                                }
+                            }
+                        })
+                    },
+                    OpenResultUrl(e) {
+                        var id = $(e.currentTarget).siblings("input.hiddenDemoData").val();
+                        var cusid = $(e.currentTarget).siblings("input.hiddencus_ct_idData").val();
+                        window.location.assign('@Url.Content("~/Modify/Detail")' + `?Id=${id}&cusctid=${cusid}`);
+                    },
+                    Openlink(e) {
+                        var id = $(e.currentTarget).siblings("input.hiddenDemoData").val();
+                        window.open(master.RootUrl + "q/Survey.aspx?Id=" + id);
+                    },
+                    Afterleave() {
+                        surveyContent.IsShow = true;
+                    },
+                    GetSurveyTableDraw() {
+                        this.SurveyTable.ajax.reload(null, false)
+                    },
+                    GetSurveyTableList() {
+                        this.SurveyTable.ajax.reload();
+                    },
+                    InitSurveyTable() {
+                        var _this = this;
+                        _this.SurveyTable = $("#surveyTable").DataTable({
+
+                            searching: false,
+                            autoWidth: false,
+                            scrollX: true,
+                            lengthChange: false,
+                            pageLength: 10,
+                            responsive: false,
+                            //serverSide: true,
+                            deferRender: true,
+                            //processing: true,
+                            ordering: true,
+                            order: [[1, 'asc']],
+                            columnDefs: [
+                            ],
+                            lengthMenu: [10],
+                            language: {
+                                url: `@Url.Content("~/lang/dataTables/tw.json")`
+                            },
+
+                            columns: [
+                                {
+                                    data: "id",
+                                    render: function (data, type, row) {
+                                        var reply = '<i class="fa fa-list rowIcon" title="內容"></i>'
+                                        return reply //+ link
+                                    },
+                                    sortable: false
+                                },
+                                {
+                                    data: "cus_ct_id",
+                                    render: function (data) {
+                                        return data;
+                                    }
+                                },
+                                {
+                                    data: "apply_Date",
+                                    render: function (data) {
+                                        if (data != "") {
+                                            return moment.utc(data).local().format('YYYY/MM/DD HH:mm:ss');
+                                        }
+                                        return "";
+                                    }
+                                },
+                                {
+                                    data: "apply_By"
+                                },
+                                {
+                                    data: "reson"
+                                },
+                                {
+                                    data: "reply",
+                                    render: function (data) {
+                                        if (data == "") {
+                                            return "待簽"
+                                        }
+                                        else {
+                                            return data;
+                                        }
+                                    }
+                                },
+                            ],
+                            ajax: {
+                                url: `@Url.Content("~/Modify/Index")`,
+                                dataSrc: "",
+                                async: true,
+                                cache: false,
+                                type: "POST",
+                                data: function data(d) {
+                                    d.Filter = JSON.stringify(_this.Filter);
+                                },
+                                beforeSend() {
+                                    //_this.ContantUsApps = [];
+                                }
+                            },
+
+
+                            createdRow(row, data, index) {
+                                console.log(data);
+                                var hidden = $('<input/>', {
+                                    type: 'hidden',
+                                    value: data.id,
+                                    class: 'hiddenDemoData'
+                                });
+                                $('td', row).eq(0).append(hidden);
+                                var hidden1 = $('<input/>', {
+                                    type: 'hidden',
+                                    value: data.cus_ct_id,
+                                    class: 'hiddencus_ct_idData'
+                                });
+                                $('td', row).eq(0).append(hidden1);
+
+                            }
+                        });
+                        //$('#surveyTable tbody').on('click', '.fa-edit', this.Edit);
+                        //$('#surveyTable tbody').on('click', '.fa-link', this.Openlink);
+                        $('#surveyTable tbody').on('click', '.fa-list', this.OpenResultUrl);
+                    },
+                }
+            });
+
+
+
+            var searchList = new Vue({
+                el: "#Search_Report",
+                data: {
+                    IsShow: true,
+                    searchTable: {},
+                    searchFilter: {
+                        Id: ""
+                    }
+                },
+                components: {
+                    loading: VueLoading
+                },
+                mounted() {
+                    //this.InitSearchTable();
+                },
+                methods: {
+                    OpenResultUrl(e) {
+                        var id = $(e.currentTarget).siblings("input.hiddenDemoData").val();
+                        console.log(id)
+                        window.location.assign('@Url.Content("~/Modify/DetailApply")' + `?Id=${id}`);
+                    },
+                    Search() {
+                        if ($.fn.DataTable.isDataTable('#searchTable')) {
+                            $('#searchTable').DataTable().destroy();
+                            $('#searchTable').empty();
+                        }
+                        //$("#searchTable").DataTable().destroy();
+                        this.InitSearchTable();
+                    },
+                    InitSearchTable() {
+                        var _this = this;
+                        _this.searchTable = $("#searchTable").DataTable({
+
+                            searching: false,
+                            autoWidth: false,
+                            scrollX: true,
+                            lengthChange: false,
+                            pageLength: 10,
+                            responsive: false,
+                            //serverSide: true,
+                            deferRender: true,
+                            //processing: true,
+                            ordering: true,
+                            order: [[1, 'asc']],
+                            columnDefs: [
+                            ],
+                            lengthMenu: [10],
+                            language: {
+                                url: `@Url.Content("~/lang/dataTables/tw.json")`
+                            },
+
+                            columns: [
+                                {
+                                    data: "id",
+                                    title: "選擇",
+                                    render: function (data, type, row) {
+                                        var reply = '<i class="fa fa-list rowIcon" title="選擇"></i>'
+                                        return reply //+ link
+                                    },
+                                    sortable: false
+                                },
+                                {
+                                    data: "cus_ct_id",
+                                    title: "客戶代號",
+                                    render: function (data) {
+                                        return data;
+                                    }
+                                },
+                                {
+                                    title: "姓名",
+                                    data: "motheR_NAME",
+                                },
+                                {
+                                    title: "產品別",
+                                    data: "productType",
+                                },
+                                {
+                                    title: "簽核狀態",
+                                    data: "stage",
+                                },
+                            ],
+                            ajax: {
+                                url: `@Url.Content("~/Modify/SearchNewReport")`,
+                                dataSrc: "",
+                                async: true,
+                                cache: false,
+                                type: "POST",
+                                data: {
+                                    Id: _this.searchFilter.Id,
+                                },
+                                beforeSend() {
+                                    //_this.ContantUsApps = [];
+                                }
+                            },
+                            createdRow(row, data, index) {
+                                console.log(data);
+                                var hidden = $('<input/>', {
+                                    type: 'hidden',
+                                    value: data.cus_ct_id,
+                                    class: 'hiddenDemoData'
+                                });
+                                $('td', row).eq(0).append(hidden);
+
+                            }
+                        });
+                        //$('#surveyTable tbody').on('click', '.fa-edit', this.Edit);
+                        //$('#surveyTable tbody').on('click', '.fa-link', this.Openlink);
+                        $('#searchTable tbody').on('click', '.fa-list', this.OpenResultUrl);
+                    },
+
+
+                }
+            });
+
+        });
+
+
+
+
+
+
+
+
+
+    </script>
+    }

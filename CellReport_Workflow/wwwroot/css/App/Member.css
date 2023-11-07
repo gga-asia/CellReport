@@ -1,0 +1,94 @@
+﻿
+.divImage {
+    margin: 3px;
+    padding: 2px;
+    float: left;
+}
+
+.liMediaObject {
+    position: relative;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.liMediaActionObject {
+    position: absolute;
+    cursor: pointer;
+    display: none;
+    right: 4px;
+    width: 100px;
+    height: 100px;
+}
+
+.liMediaObject .liMediaActionObject {
+    display: none;
+}
+
+.liMediaObject:hover .liMediaActionObject {
+    display: inline;
+}
+
+.liMediaObject:hover {
+    border: 2px solid #3276b1;
+}
+
+#SnapShotTable .Snapshot {
+    transition: transform 0.5s;
+    transform-origin: 0 30%;
+    position: relative;
+}
+
+
+
+    #SnapShotTable .Snapshot:hover {
+        cursor: pointer;
+        transform: scale(5);
+        position: relative;
+        z-index: 100000;
+    }
+
+
+
+#SnapShotTable_wrapper .dataTables_scrollBody {
+    overflow: unset !important;
+}
+
+#SnapShotTable .dataTables_scrollBody {
+    overflow: unset !important;
+}
+
+#SnapShotTable .columnStyle {
+    vertical-align: middle
+}
+
+.addface {
+    cursor: pointer;
+    color: #3276b1;
+    font-size: 20px;
+}
+
+.td-checkbox {
+    text-align: center;
+    width: 30px;
+    vertical-align: middle !important;
+}
+
+.td-align-center {
+    padding: 2px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    vertical-align: middle !important;
+}
+.td-align-left {
+    padding: 1rem !important;
+    text-align: left !important;
+    vertical-align: middle !important;
+    vertical-align: middle !important;
+}
+
+.SpecialSelect {
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 2px !important;
+    border-width: 2px !important;
+}

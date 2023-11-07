@@ -1,0 +1,181 @@
+﻿@{
+    Layout = "_Layout_login";
+}
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@{
+    Layout = "_Layout_login";
+}
+
+<div id="vm01" style="height: 100vh; background-color: aliceblue !important;" v-cloak>
+    <div class="blankpage-form-field">
+        <div class="mb-2">
+            <img src="~/img/bionet_logo.png" style="width: 100%" />
+        </div>
+        <div class="mb-2 h1 " style="text-align: center;">{{SystemName}}</div>
+        <div class="mb-1 h5" style="text-align: center; color: red;">*請使用Windows開機帳號與密碼登入</div>
+        <div class="mb-1 h5" style="text-align: center; color: red;">*帳號 無須輸入@後面email地址</div>
+        <div class="mb-1 h5" style="text-align: center; color: red;">*請使用Chrome瀏覽器開啟</div>
+        <div class="form-group mb-1">
+            <label class="form-label" for="username">帳號</label>
+            <input type="text" class="form-control" v-on:keyup.enter="SignIn" v-model="Username" />
+        </div>
+        <div class="form-group mb-2">
+            <label class="form-label" for="username">密碼</label>
+            <input type="password" class="form-control" v-on:keyup.enter="SignIn" v-model="Password" />
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-info w-100" v-on:click="SignIn">登入</button>
+
+        </div>
+    </div>
+
+</div>
+
+@*<form id="form">
+    <img class="mb-4" src="~/img/bionet_logo.png" style="width:20rem;" alt="訊聯生物科技集團" />
+    <h1 class="h3 mb-3 fw-normal">儲存槽監控紀錄</h1>
+    <h3 style="color: red; font-size: 1.0rem;">*請使用開機帳號登入</h3>
+    <div class="form-floating">
+        <label id="a" for="floatingInput">帳號</label>
+        <input Class="form-control" ID="i_ID" style="Width:100%" placeholder="開機帳號" />
+    </div>
+    <div class="form-floating">
+        <!--<input type="password" class="form-control" id="floatingPassword" placeholder="Password">-->
+        <label id="p" for="floatingPassword">密碼</label>
+        <input Class="form-control" ID="i_PW" style="Width:100%" type="password" placeholder="密碼" />
+    </div>
+    <input type="button" id="SignInBtn" class="w-100 btn btn-lg btn-primary" value="登入" />
+    <p id="mess" style="color:red;"></p>
+    <div class="spinner-border" role="status" style="margin-top:5px; display:none" id="loading">
+        <span class="sr-only"></span>
+    </div>
+</form>*@
+
+@section Scripts{
+    <script>
+
+        var vm01 = new Vue({
+            el: "#vm01",
+            data: {
+                SystemName: "細胞報告電子簽核",
+                Username: '',
+                Password: '',
+                loading: false
+            }, mounted() {
+                document.title = this.SystemName + "登入";
+
+            },
+
+            methods: {
+                SignIn() {
+                    var _this = this;
+                    if (!!_this.Username && !!_this.Password && _this.Password.length >= 0) {
+                        $.ajax({
+                            type: 'POST',
+                            async: true,
+                            cache: false,
+                            url: `@Url.Content("~/Login/Login")`,
+                            data: {
+                                Account: _this.Username,
+                                Password: _this.Password
+                            }
+                            //    beforeSend: function beforeSend(xhr) {
+                            //_this.loading = true;
+                            //xhr.setRequestHeader('Authorization', 'Basic ' + btoa(_this.Username + ':' + _this.Password));
+                            //}
+                        }).then(function (res) {
+                            if (res == "OK") {
+                                window.location = `@Url.Content("~/Report/Index")`
+
+                            } else {
+                                toastr.error("錯誤", res, {
+                                    timeOut: 0
+                                });
+                            }
+                        }, function (err) {
+                            toastr.error("Error", err, {
+                                timeOut: 0
+                            });
+                        }).always(function () {
+                            _this.loading = false;
+                        });
+                    }
+                }
+            }
+        });
+
+
+    </script>
+
+    <script>
+        //var acc, pass = "";
+        //var messShow = document.getElementById("mess")
+        //$("#i_ID").on("click", function () { $("#a").css("display", "none"); });
+        //$("#i_PW").on("click", function () { $("#p").css("display", "none"); });
+        //$("#i_ID").on("blur", function () { if ($("#i_ID").val() == "") $("#a").css("display", ""); });
+        //$("#i_PW").on("blur", function () { if ($("#i_PW").val() == "") $("#p").css("display", ""); });
+
+        //$("#SignInBtn").on("click", function () {
+        //    acc = $("#i_ID").val();
+        //    pass = $("#i_PW").val();
+        //    if (acc != "" && pass != "") {
+        //        $("#loading").css("display", "");
+        //        messShow.innerText = ""
+        //        $.ajax({
+        //            url: `@Url.Content("~/Login/Login")`,
+        //            type: "post",
+        //            dataType: "json",
+        //            data: {
+        //                Account: acc,
+        //                Password: pass
+        //            }
+        //        })
+        //            .done(data => {
+        //                if (data == "OK") {
+        //                    location.replace(`@Url.Content("~/Home/Index")`);
+        //                }
+        //                else
+        //                    messShow.innerText = data;
+        //                $("#loading").css("display", "none");
+        //            });
+        //    }
+        //    else {
+        //        messShow.innerText = "請輸入完整資料"
+        //    }
+        //});
+        //document.getElementById("form").addEventListener("keypress", function (event) {
+        //    if (event.key === "Enter")
+        //        $("#SignInBtn").click();
+        //});
+    </script>
+}
+
+@*<div id="vm01" style="height: 100vh; background-color: aliceblue !important;" v-cloak>
+    <div class="blankpage-form-field">
+        <div class="mb-2">
+            <img src="~/img/bionet_logo.png" style="width: 100%" />
+        </div>
+        <div class="mb-2 h1 " style="text-align: center;">{{SystemName}}</div>
+        <div class="mb-1 h5" style="text-align: center; color: red;">*請使用Windows開機帳號與密碼登入</div>
+        <div class="mb-1 h5" style="text-align: center; color: red;">*帳號 無須輸入@後面email地址</div>
+        <div class="mb-1 h5" style="text-align: center; color: red;">*請使用Chrome瀏覽器開啟</div>
+        <div class="form-group mb-1">
+            <label class="form-label" for="username">帳號</label>
+            <input type="text" class="form-control" v-on:keyup.enter="SignIn" v-model="Username" />
+        </div>
+        <div class="form-group mb-2">
+            <label class="form-label" for="username">密碼</label>
+            <input type="password" class="form-control" v-on:keyup.enter="SignIn" v-model="Password" />
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-info w-100" v-on:click="SignIn">登入</button>
+
+        </div>
+    </div>
+
+</div>*@

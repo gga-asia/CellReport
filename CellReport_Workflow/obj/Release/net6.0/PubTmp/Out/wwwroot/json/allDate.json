@@ -1,0 +1,179 @@
+[
+  {
+    "Id": "0",
+    "ReportDate": "2020/03/25  ",
+    "Cus_CT_ID": "ASC10205110009",
+    "Cus_Name": "塗晟達",
+    "Store_Date": "2020/03/10 ",
+    "Status": "品質主管複核"
+  },
+  {
+    "Id": "1",
+    "ReportDate": "2020/03/31 ",
+    "Cus_CT_ID": "ASC10711210003",
+    "Cus_Name": "王睿羚",
+    "Store_Date": "2020/03/17 ",
+    "Status": "品質主管複核"
+  },
+  {
+    "Id": "2",
+    "ReportDate": "2020/03/25",
+    "Cus_CT_ID": "ASM10712250011",
+    "Cus_Name": "鄭綜騰",
+    "Store_Date": "2020/03/12",
+    "Status": "Lab主管複核"
+  },
+  {
+    "Id": "3",
+    "ReportDate": "2020/04/07",
+    "Cus_CT_ID": "ASM10804060005",
+    "Cus_Name": "陳玲虹",
+    "Store_Date": "2020/03/24",
+    "Status": "簽核完成"
+  },
+  {
+    "Id": "4",
+    "ReportDate": "2020/04/30",
+    "Cus_CT_ID": "ASC10805130013",
+    "Cus_Name": "車黎麗",
+    "Store_Date": "2020/04/09",
+    "Status": "品質主管複核"
+  },
+  {
+    "Id": "5",
+    "ReportDate": "2020/04/20",
+    "Cus_CT_ID": "ASC10811200064",
+    "Cus_Name": "王泰允 ",
+    "Store_Date": "2013/05/07 ",
+    "Status": "品質主管複核"
+  },
+  {
+    "Id": "6",
+    "ReportDate": "2020/03/31",
+    "Cus_CT_ID": "ASC10903040016",
+    "Cus_Name": "楊淑惠",
+    "Store_Date": "2020/03/13",
+    "Status": "Lab主管複核"
+  },
+  {
+    "Id": "7",
+    "ReportDate": "2020/03/31",
+    "Cus_CT_ID": "ASC10903260033",
+    "Cus_Name": "何永吉",
+    "Store_Date": "2020/03/17",
+    "Status": "品質主管複核"
+  },
+  {
+    "Id": "11",
+    "ReportDate": "2020/05/23",
+    "Cus_CT_ID": "MSC09410010001",
+    "Cus_Name": "簡秋雲",
+    "Store_Date": "2020/05/12",
+    "Status": "品質主管複核"
+  },
+  {
+    "Id": "12",
+    "ReportDate": "2020/05/22",
+    "Cus_CT_ID": "MSC09410080002",
+    "Cus_Name": "鄭安琪",
+    "Store_Date": "2020/04/24",
+    "Status": "Lab主管複核"
+  },
+  {
+    "Id": "13",
+    "ReportDate": "2020/05/22",
+    "Cus_CT_ID": "MSC09410200007",
+    "Cus_Name": "李美玉",
+    "Store_Date": "2020/04/24",
+    "Status": "簽核完成"
+  },
+  {
+    "Id": "14",
+    "ReportDate": "2020/05/25",
+    "Cus_CT_ID": "MSC09410290010",
+    "Cus_Name": "黃麗雲",
+    "Store_Date": "2020/04/24",
+    "Status": "品質主管複核"
+  },
+  {
+    "Id": "15",
+    "ReportDate": "2020/05/25",
+    "Cus_CT_ID": "MH10605080062",
+    "Cus_Name": "胡雅雯",
+    "Store_Date": "2020/04/24",
+    "Status": "品質主管複核"
+  },
+  {
+    "Id": "16",
+    "ReportDate": "2020/05/30",
+    "Cus_CT_ID": "MST10611120494",
+    "Cus_Name": "廖沛淳",
+    "Store_Date": "2020/04/24",
+    "Status": "Lab主管複核"
+  },
+  {
+    "Id": "17",
+    "ReportDate": "2020/05/30",
+    "Cus_CT_ID": "MST10705170237",
+    "Cus_Name": "黃玲琪",
+    "Store_Date": "2020/04/24",
+    "Status": "報告釋出"
+  },
+  {
+    "Id": "18",
+    "ReportDate": "2020/06/01",
+    "Cus_CT_ID": "MST10706210291",
+    "Cus_Name": "唐于雅",
+    "Store_Date": "2013/04/19 ",
+    "Status": "品質主管複核"
+  },
+  {
+    "Id": "19",
+    "ReportDate": "2020/05/25",
+    "Cus_CT_ID": "MDW10801020001",
+    "Cus_Name": "栢惠貞",
+    "Store_Date": "2013/05/21 ",
+    "Status": "品質主管複核"
+  },
+  {
+    "Id": "20",
+    "ReportDate": "2020/06/01",
+    "Cus_CT_ID": "MDW10801090008",
+    "Cus_Name": "王姝棻",
+    "Store_Date": "2013/05/07 ",
+    "Status": "Lab主管複核"
+  },
+  {
+    "Id": "531",
+    "ReportDate": "2020/05/16 02:15",
+    "Cus_CT_ID": "N10905160246",
+    "Cus_Name": "江俐穎",
+    "Store_Date": "2020/05/16 13:45",
+    "Status": "Lab主管複核"
+  },
+  {
+    "Id": "532",
+    "ReportDate": "2020/05/16 21:30",
+    "Cus_CT_ID": "HN10905170294",
+    "Cus_Name": "彭馨儀",
+    "Store_Date": "2020/05/17 13:00",
+    "Status": "Lab主管複核"
+  },
+  {
+    "Id": "533",
+    "ReportDate": "2020/05/18 09:17",
+    "Cus_CT_ID": "N10905180248",
+    "Cus_Name": "楊婉嫆",
+    "Store_Date": "2020/05/18 13:25",
+    "Status": "品質主管複核"
+  },
+  {
+    "Id": "534",
+    "ReportDate": "2020/05/18 09:10",
+    "Cus_CT_ID": "HN10905180296",
+    "Cus_Name": "楊硯貞",
+    "Store_Date": "2020/05/18 13:25",
+    "Status": "品質主管複核"
+  }
+]
+

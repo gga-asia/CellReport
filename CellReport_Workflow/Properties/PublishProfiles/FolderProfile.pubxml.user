@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\WebSite\CellReport_Workflow</_PublishTargetUrl>
+    <History>True|2023-11-02T08:31:22.7374973Z;True|2023-10-16T13:53:53.7932745+08:00;True|2023-10-04T17:44:27.7265288+08:00;True|2023-09-12T08:52:19.9343661+08:00;True|2023-09-06T14:57:55.1089401+08:00;True|2023-09-06T14:05:49.8968745+08:00;True|2023-09-06T13:52:35.4620840+08:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>

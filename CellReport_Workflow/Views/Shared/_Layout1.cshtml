@@ -1,0 +1,285 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <meta charset="utf-8">
+    <title></title>
+    <%--
+    <meta name="description" content="Marketing Dashboard">--%>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+    <!-- Call App Mode on ios devices -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Remove Tap Highlight on Windows Phone IE -->
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- base css -->
+    <link href="~/css/vendors.bundle.css" rel="stylesheet" />
+    <link href="~/css/app.bundle.css" rel="stylesheet" />
+    <link href="~/css/fa-solid.css" rel="stylesheet" />
+    @*<link href="~/css/notifications/toastr/toastr.css" rel="stylesheet" />*@
+    <link href="~/css/themes/cust-theme-custom.css" rel="stylesheet" />
+    <link href="~/js/vue-loading-overlay/vue-loading.css" rel="stylesheet" />
+    <link href="~/css/datagrid/datatables/datatables.bundle.css" rel="stylesheet" />
+    <link href="~/js/jquery.datetimepicker/jquery.datetimepicker.min.css" rel="stylesheet" />
+    <link href="~/js/vue-multiselect/vue-multiselect.min.css" rel="stylesheet" />
+    <link href="~/css/toastr.css" rel="stylesheet" />
+
+            @*<asp:ContentPlaceHolder ID="head" runat="server">-------------------------------------------------------------------------*************
+    </asp:ContentPlaceHolder>*@
+    <script>
+        paceOptions = {
+            ajax: {
+                trackWebSockets: false
+            }
+        };
+        var master = {
+            RootUrl: `@Url.Content("~/")`,
+        };
+
+    </script>
+
+</head>
+<body class="mod-bg-1 header-function-fixed nav-function-fixed mod-hide-info-card mod-nav-link">
+    <!-- BEGIN Page Wrapper -->
+    <div class="page-wrapper">
+        <div class="page-inner">
+            <!-- BEGIN Left Aside -->
+            <aside class="page-sidebar">
+                <div class="page-logo">
+                    <a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
+                        <div class="d-flex align-items-center position-relative">
+                            <span class="page-logo-text ml-3" style="font-size: 23px; padding-top: 5px;">
+                                細胞報告電子簽核
+                            </span>
+                        </div>
+                    </a>
+                </div>
+                <!-- BEGIN PRIMARY NAVIGATION -->
+                <nav id="js-primary-nav" class="primary-nav" role="navigation">
+
+
+                    <ul id="js-nav-menu" class="nav-menu">
+                        <li>
+                            <a asp-controller="Report" asp-action="Index">
+                                <i class="fal fa-book"></i>
+                                <span class="nav-link-text">報告列表</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul id="js-nav-menu" class="nav-menu waitSing" >
+                        <li>
+                            <a asp-controller="Report" asp-action="WaitIndex">
+                                <i class="fal fa-book"></i>
+                                <span class="nav-link-text">待簽報告</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul id="js-nav-menu" class="nav-menu">
+                        <li>
+                            <a asp-controller="Modify" asp-action="Index">
+                                <i class="fal fa-book"></i>
+                                <span class="nav-link-text">報告修正申請</span>
+                            </a>
+                        </li>
+                    </ul>
+
+
+                    <div class="filter-message js-filter-message bg-success-600"></div>
+                </nav>
+                <!-- END PRIMARY NAVIGATION -->
+                <!-- END NAV FOOTER -->
+            </aside>
+            <div class="page-content-wrapper">
+                <!-- BEGIN Page Header -->
+                <header class="page-header" role="banner">
+                    <!-- we need this logo when user switches to nav-function-top -->
+
+                    <div class="page-logo">
+                        <a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
+                            <div class="d-flex align-items-center position-relative">
+
+                                @*<span class="page-logo-text ml-3" style="font-size: 30px; padding-top: 5px;">問卷後台</span>*@
+
+                            </div>
+                        </a>
+                    </div>
+                    <!-- DOC: nav menu layout change shortcut -->
+                    <div class="hidden-md-down dropdown-icon-menu position-relative">
+                        <a href="#" class="header-btn btn js-waves-off" data-action="toggle" data-class="nav-function-hidden" title="Hide Navigation">
+                            <i class="ni ni-menu"></i>
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="#" class="btn js-waves-off" data-action="toggle" data-class="nav-function-minify" title="Minify Navigation">
+                                    <i class="ni ni-minify-nav"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="btn js-waves-off" data-action="toggle" data-class="nav-function-fixed" title="Lock Navigation">
+                                    <i class="ni ni-lock-nav"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- DOC: mobile button appears during mobile width -->
+                    <div class="hidden-lg-up">
+                        <a href="#" class="header-btn btn press-scale-down" data-action="toggle" data-class="mobile-nav-on">
+                            <i class="ni ni-menu"></i>
+                        </a>
+                    </div>
+
+                    <div class="ml-auto d-flex">
+
+
+                        <!-- app user menu -->
+                        <div>
+                            <a href="#" data-toggle="dropdown" class="header-icon d-flex align-items-center justify-content-center ml-2">
+                                <img src="~/img/user-icon-300x300.png" class="profile-image rounded-circle" />
+                                @*<%--you can also add username next to the avatar with the codes below:--%>*@
+                                <span class="ml-1 mr-1 text-truncate text-truncate-header hidden-xs-down"></span>
+                                <i class="ni ni-chevron-down hidden-xs-down"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-animated dropdown-lg">
+                                <div class="dropdown-header bg-trans-gradient d-flex flex-row py-4 rounded-top">
+                                    <div class="d-flex flex-row align-items-center mt-1 mb-1 color-white">
+                                        <span class="mr-2">
+                                            <img src="~/img/user.png" class="rounded-circle profile-image" />
+                                        </span>
+                                        <div class="info-card-text">
+                                            <div class="fs-lg text-truncate text-truncate-lg"><p id="P_NAME"></p></div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <a class="dropdown-item fw-500 pt-3 pb-3" asp-controller="Login" asp-action="Logout">
+                                    <span>登出</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <!-- END Page Header -->
+                <!-- BEGIN Page Content -->
+                <!-- the #js-page-content id is needed for some plugins to initialize -->
+                <main id="js-page-content" role="main" class="page-content">
+                    @RenderBody()
+                </main>
+
+                <div class="page-content-overlay" data-action="toggle" data-class="mobile-nav-on"></div>
+                <!-- END Page Content -->
+                <!-- BEGIN Page Footer -->
+                <footer class="page-footer" role="contentinfo">
+                    @*<%--版權--%>*@
+                    <div class="d-flex align-items-center flex-1 text-muted">
+                    </div>
+                    @*<%--版本號--%>*@
+                    <div class="d-flex align-items-right flex-1 text-muted">
+                    </div>
+
+                </footer>
+            </div>
+        </div>
+
+    </div>
+    <script src="~/js/jquery/jquery-3.4.1.min.js"></script>
+
+
+    <script src="~/js/vue/vue.js"></script>
+    <script src="~/js/vendors.bundle.js"></script>
+
+    <script src="~/js/app.bundle.js"></script>
+    @*<script src="~/js/notifications/toastr/toastr.js"></script>*@
+    <script src="~/js/vue-loading-overlay/vue-loading-overlay@3.js"></script>
+    <script src="~/scripts/vuecomponents/vue-input.js"></script>
+    <script src="~/scripts/vuecomponents/vue-button.js"></script>
+    <script src="~/js/datagrid/datatables/datatables.bundle.js"></script>
+    <script src="~/scripts/vuecomponents/vue-select.js"></script>
+    <script src="~/js/jquery.validate/jquery.validate.min.js"></script>
+    <script src="~/js/vue-multiselect/vue-multiselect.min.js"></script>
+    <script src="~/scripts/vuecomponents/vue-datepicker.js"></script>
+    <script src="~/js/jquery.datetimepicker/jquery.datetimepicker.full.min.js"></script>
+    <script src="~/scripts/vuecomponents/vue-datetime.js"></script>
+    <script src="~/scripts/vuecomponents/vue-multicheckbox.js"></script>
+    <script src="~/scripts/vuecomponents/vue-bar-chart.js"></script>
+    <script src="~/js/dependency/moment/moment.js"></script>
+    <script src="~/js/dependency/moment/moment-timezone-with-data.js"></script>
+    <script src="~/scripts/vuecomponents/vue-checkbox.js"></script>
+    <script src="~/js/formplugins/smartwizard/smartwizard.js"></script>
+    <script src="~/scripts/vuecomponents/vue-timepicker.js"></script>
+    <script src="~/scripts/vuecomponents/vue-button-datepicker.js"></script>
+    <script src="~/js/vue-input-tag/vue-input-tag.min.js"></script>
+    <script src="~/js/toastr.js"></script>
+    <script src="~/js/publicscript.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            $('#js-page-content').smartPanel({
+                localStorage: false
+            });
+            var pageLink = window.location.pathname + window.location.search;
+            var count = 0;
+            $("#js-nav-menu a[href='" + pageLink + "']").parents("li").each(function () {
+                if (count == 0) {
+                    $(this).addClass("active");
+                } else {
+                    $(this).addClass("active open");
+                }
+                count++;
+
+            })
+
+            if (typeof $.validator == "function") {
+                //validator 多國語系
+                $.extend($.validator.messages, {
+                    required: "此欄位必須填寫",
+                    email: "請輸入正確的電子郵件格式。",
+
+                });
+
+                //新增方法
+                $.validator.addMethod("alphanumeric", function (value, element) {
+                    return this.optional(element) || /^[a-zA-Z0-9]+$/.test(value);
+                }, "只允許輸入英文跟數字");
+
+            }
+            moment.suppressDeprecationWarnings = true;
+
+        })
+
+    </script>
+    @* <asp:ContentPlaceHolder ID="PageScriptInit" runat="server">
+    </asp:ContentPlaceHolder>*@
+    <script>
+        const ID = '@ViewBag.U.Emp_Id';
+        const NAME = '@ViewBag.U.Account';
+        const DEPARTMENT = decodeHtmlEntities('@ViewBag.U.Department');
+        const RANK = decodeHtmlEntities('@ViewBag.U.Rank');
+        const PAGE = '@ViewBag.U.PageEnAble';
+        $("#P_NAME").text(NAME);
+        function decodeHtmlEntities(encodedString) {
+            var elem = document.createElement('textarea');
+            elem.innerHTML = encodedString;
+            return elem.value;
+        }
+        //waitSing
+        if(RANK != "部門主管"){
+            $(".waitSing").css("display","none")
+        }
+
+
+
+        const STATUS = {
+            LAB_SEND: "Lab送出資料",
+            QC_SING: "品質主管複核",
+            LAB_SING: "Lab主管複核",
+            RELEASE: "報告上傳"
+        }
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>
+
+
