@@ -7,9 +7,11 @@
 <script src="~/js/highlight.min.js"></script>
 <script src="~/js/quill.js"></script>
 <link href="~/css/other.css" rel="stylesheet" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf_viewer.min.css" rel="stylesheet" type="text/css" />
+
 
 <div class="row">
-
     <div id="reportInfo" class="col-lg-12 col-md-12">
 
         <div class="panel"
@@ -25,19 +27,12 @@
                 <h2>
                     {{Cus_CT_ID}}
                 </h2>
-                @* <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
-                <label class="btn btn-info waves-effect waves-themed">
-                <input type="radio" name="options" id="option1" checked="checked">上一筆
-                </label>
-                <label class="btn btn-info waves-effect waves-themed active">
-                <input type="radio" name="options" id="option3"> 下一筆
-                </label>
-                </div>*@
                 <div class="col-md-8" id="reportStu">
                     <div style="display: flex; align-items: center; justify-content: center;">
                         <div class="rounded-plus bg-fusion-50 height-1 bg-faded cent" style="margin:10px; width:20%">
                             <p style="margin:0 !important" class="stuP">Lab送出資料</p>
                         </div>
+
                         <i class="ni ni-chevron-right fa-2x"></i>
                         <div class="rounded-plus bg-fusion-50 height-1 bg-faded cent" style="margin:10px; width:20%">
                             <p style="margin:0 !important" class="stuP">品質主管複核</p>
@@ -48,7 +43,7 @@
                         </div>
                         <i class="ni ni-chevron-right fa-2x"></i>
                         <div class="rounded-plus bg-fusion-50  height-1 bg-faded cent" style="margin:10px; width:20%">
-                        <p style="margin:0 !important" class="stuP">簽核完成</p>
+                            <p style="margin:0 !important" class="stuP">簽核完成</p>
                         </div>
                         <i class="ni ni-chevron-right fa-2x"></i>
                         <div class="rounded-plus bg-fusion-50  height-1 bg-faded cent" style="margin:10px; width:20%">
@@ -64,16 +59,6 @@
                             <div class="col-12" style="display:flex">
                                 <div class="col-md-12">
                                     <div style="display:flex; ">
-                                        @*<div style="width:50%;  align-items: center; justify-content: center;">
-
-                                        <p>姓名: {{name}}</p>
-                                        <p>檢體編號: {{Cus_CT_ID}}</p>
-                                        </div>
-                                        <div style="width:50%;  align-items: center; justify-content: center;">
-                                        <p>報告日: {{ReportDate}}</p>
-                                        <p>狀態: {{Status}}</p>
-                                        </div>*@
-
                                         <table id="123" class="w-100 mt-2 mb-0">
                                             <thead>
                                                 <tr>
@@ -86,17 +71,23 @@
                                             <tbody>
                                             </tbody>
                                         </table>
-                                        @*<iframe src="http://localhost/in/ASC10711210003.PDF" style="height:1200px; width:100%"></iframe>*@
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        @*  <object data="https://lis.babybanks.com/InProgress/MSC113/Store_C/MST11301240061.pdf"
+                        width="800"
+                        height="800"
+                        type="text/html">
+                        </object> *@
+                        @* <embed type="text/html" src="https://lis.babybanks.com/InProgress/MSC113/Store_C/MST11301240061.pdf" width="800" height="500"> *@
                         <hr />
                         <div class="frame-wrap w-100 pr-2 pl-2" style="margin-bottom:5px">
                             <div class="accordion" id="accordionExample">
                                 <div class="card">
                                     <div class="card-header" id="headingOne">
-                                        <a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                             查看報告
                                             <span class="ml-auto">
                                                 <span class="collapsed-reveal">
@@ -107,17 +98,23 @@
                                                 </span>
                                             </span>
                                         </a>
+                                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                                            <div id="current_pdf_container" style="display:flex;  justify-content:center;  align-items:center;"></div>
+                                            @* <div id="pdf_container"></div> *@
+                                            @* <iframe src="https://lis.babybanks.com:443/InProgress/ADSC112/ADSC_C/ACC11212130113.pdf" scrolling="no" style="overflow: hidden !important; height: 1200px; width: 100%;"></iframe> *@
+                                            @* <template>
+                                            <div class="panel-content container" v-for="(item, index) in currentReports" style="margin-bottom:5px !important;width:100%">
+                                            <iframe v-bind:src="item" scrolling="no" style="overflow:hidden !important;height:1200px; width:100%" title="Your descriptive title" sandbox="allow-scripts" seamless></iframe>
 
-                                        @*<iframe src="~/file/ffdp112_e_ffdp11203212.pdf" style="height:1200px; width:100%"></iframe>*@
-                                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample" style="">
-                                            <div class="card-body">
-                                                <iframe src="~/file/@{
-                                                                                                                @ViewBag.Id
-}.PDF" style="height:1200px; width:100%"></iframe>
-                                                <iframe src="~/file/@{
-                                                                                                                @ViewBag.Id
-}_HLACheck_C.pdf" style="height:1200px; width:100%" class="HLA"></iframe>
                                             </div>
+                                            </template> *@
+                                            <div id="uploadsplit"></div>
+                                            @* <template>
+                                            <div class="panel-content" v-for="(item, index) in uploadReports" style="margin-bottom:5px !important;">
+                                            <iframe v-bind:src="item" style="height:1200px; width:100%" title="Your descriptive title" allow="cross-origin" sandbox="allow-scripts" seamless></iframe>
+                                            </div>
+                                            </template> *@
+                                            <div id="upload_pdf_container"></div>
                                         </div>
                                     </div>
                                     <div class="card">
@@ -136,6 +133,12 @@
                                         </div>
                                         <div id="collapseTwo" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample" style="">
                                             <div class="card-body">
+                                                <div id="history_pdf_container"></div>
+                                                @* <template>
+                                                <div class="panel-content" v-for="(item, index) in historyReports" style="margin-bottom:5px !important">
+                                                <iframe v-bind:src="item" style="height:1200px; width:100%"></iframe>
+                                                </div>
+                                                </template> *@
                                             </div>
                                         </div>
                                     </div>
@@ -175,16 +178,16 @@
                             </div>
                             <div class="col-12 pt-0 pr-3 pl-3" style="height: 100px">
                                 <label class="form-label" for="example-textarea"> 簽核建議:</label>
-                                <textarea class="form-control" id="example-textarea" rows="1"></textarea>
+                                <textarea class="form-control" id="example-textarea" rows="1" v-model.trim="reply_remark_keyIn"></textarea>
                                 <div class="cent" style="display:flex">
 
+                                    <button type="button" class="btn btn-xs btn-info waves-effect waves-themed mr-1 mb-1 mt-1" id="SendLAB" style="display:none" v-on:click="SendToLab">發送修改通知</button>
                                     <button type="button" class="btn btn-xs btn-info waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="Sign_Lab" id="sigLAB" style="display:none">Lab主管覆核</button>
                                     <button type="button" class="btn btn-xs btn-info waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="Sign_QC" id="sigQC" style="display:none">品質主管覆核</button>
                                     <button type="button" class="btn btn-xs btn-info waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="Release" id="release" style="display:none">上傳報告</button>
 
                                     <button type="button" class="btn btn-xs btn-secondary waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="last">上一筆</button>
                                     <button type="button" class="btn btn-xs btn-secondary waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="next">下一筆</button>
-                                    @*<button type="button" class="btn btn-xs btn-danger waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="Reject" id="unsig">反簽核</button>*@
                                 </div>
                             </div>
                         </div>
@@ -192,230 +195,502 @@
                 </div>
             </div>
         </div>
-
     </div>
+</div>
 
-    @section Scripts{
-        <script>
-            var report_Info = new Vue({
-                el: "#reportInfo",
-                data: {
-                    RecordTable: {},
-                    name: "",
-                    Cus_CT_ID: "",
-                    ReportDate: "",
-                    Status: "",
-                    ProductType: "",
-                    //showInput: false
+@section Scripts {
+    <script>
+        var pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
+        var pdfDoc = null;
+        var scale = 1; //Set Scale for zooming PDF.
+        var resolution = 1.5; //Set Resolution to Adjust PDF clarity.
+
+        // function LoadPdfFromUrl(url) {
+        //     //Read PDF from URL.
+        //     pdfjsLib.getDocument(url).promise.then(function (pdfDoc_) {
+        //         pdfDoc = pdfDoc_;
+
+        //         //Reference the Container DIV.
+        //         var pdf_container = document.getElementById("pdf_container");
+        //         pdf_container.style.display = "block";
+
+        //         //Loop and render all pages.
+        //         for (var i = 1; i <= pdfDoc.numPages; i++) {
+        //             RenderPage(pdf_container, i);
+        //         }
+        //     });
+        // };
+        // function RenderPage(pdf_container, num) {
+        //     pdfDoc.getPage(num).then(function (page) {
+        //         //Create Canvas element and append to the Container DIV.
+        //         var canvas = document.createElement('canvas');
+        //         canvas.id = 'pdf-' + num;
+        //         ctx = canvas.getContext('2d');
+        //         pdf_container.appendChild(canvas);
+
+        //         //Create and add empty DIV to add SPACE between pages.
+        //         var spacer = document.createElement("div");
+        //         spacer.style.height = "20px";
+        //         pdf_container.appendChild(spacer);
+
+        //         //Set the Canvas dimensions using ViewPort and Scale.
+        //         var viewport = page.getViewport({ scale: scale });
+        //         canvas.height = resolution * viewport.height;
+        //         canvas.width = resolution * viewport.width;
+
+        //         //Render the PDF page.
+        //         var renderContext = {
+        //             canvasContext: ctx,
+        //             viewport: viewport,
+        //             transform: [resolution, 0, 0, resolution, 0, 0]
+        //         };
+
+        //         page.render(renderContext);
+        //     });
+        // };
+
+
+
+        var report_Info = new Vue({
+            el: "#reportInfo",
+            data: {
+                RecordTable: {},
+                name: "",
+                Cus_CT_ID: "",
+                ReportDate: "",
+                Status: "",
+                ProductType: "",
+                reply_remark_keyIn: "",
+                currentReports: [],
+                historyReports: [],
+                uploadReports: [],
+                // resolution: 1.5 ,
+                // scale: 1 ,
+                // pdfDoc: null,
+                // pdfjsLib: window['pdfjs-dist/build/pdf'],
+
+                //showInput: false
+            },
+            mounted() {
+                $.ajax({
+                    url: `@Url.Content("~/Report/Details")`,
+                    type: "post",
+                    dataType: "json",
+                    data: { Id: '@ViewBag.Id' }
+                })
+                    .done(data => {
+                        console.log(data);
+                    });
+                $.ajax({
+                    url: `@Url.Content("~/Report/Details")`,
+                    type: "post",
+                    dataType: "json",
+                    data: { Id: '@ViewBag.Id' }
+                })
+                    .done(data => {
+                        console.log(data);
+                        report_Info.name = data.motheR_NAME;
+                        report_Info.Cus_CT_ID = data.cus_ct_id;
+                        report_Info.ReportDate = data.final_Date;
+                        report_Info.Status = data.stage;
+                        report_Info.ProductType = data.productType;
+                        //if (data.hla != "Y") {
+                        //    $(".HLA").css("display", "none");
+                        //}
+                        const Stu = $(`#reportStu p:contains('${data.stage}')`);
+                        Stu.parent("div").css("background-color", " #1DC9B7")
+                        Stu.parent("div").prevAll("div").css("background-color", "#1DC9B7")
+
+
+                        if (data.stage == STATUS.LAB_SEND) {
+                            if (RANK == SYSRANK.QC) {
+                                $("#sigQC").css("display", "");
+                                $("#SendLAB").css("display", "");
+                            }
+                        }
+                        else if (data.stage == STATUS.QC_SING) {
+                            if (RANK == SYSRANK.LAB) {
+                                $("#sigLAB").css("display", "");
+                                $("#SendLAB").css("display", "");
+                            }
+                        }
+                        else if (data.stage == STATUS.SING_FINISH) {
+                            if (RANK == SYSRANK.LAB) {
+                                $("#release").css("display", "");
+                                $("#SendLAB").css("display", "");
+                            }
+                        }
+
+                        //if (data.productType == "MSC" || data.productType == "ADSC" || data.productType == "TSC") {
+                        //    if (DEPARTMENT == "細胞實驗室" && RANK == "部門主管") {
+                        //        if (data.stage == "品質主管複核") {
+                        //            $("#sigLAB").css("display", "");
+                        //            console.log("1");
+                        //        }
+                        //        else if (data.stage == "簽核完成") {
+                        //            $("#release").css("display", "");
+                        //            console.log("2");
+                        //        }
+                        //    }
+                        //    else if (DEPARTMENT == "造血實驗室" && (RANK == "部門主管" || RANK == "單位主管")) {
+                        //        if (data.stage == "Lab送出資料") {
+                        //            $("#sigQC").css("display", "");
+                        //            console.log("3");
+                        //        }
+                        //    }
+                        //}
+                        //else if (data.productType == "CB" || data.productType == "PBSC") {
+                        //    if (DEPARTMENT == "造血實驗室" && RANK == "部門主管") {
+                        //        if (data.stage == "品質主管複核") {
+                        //            $("#sigLAB").css("display", "");
+                        //            console.log("4");
+                        //        }
+                        //        else if (data.stage == "簽核完成") {
+                        //            $("#release").css("display", "");
+                        //            console.log("5");
+                        //        }
+                        //    }
+                        //    else if (DEPARTMENT == "細胞實驗室" && (RANK == "部門主管" || RANK == "單位主管")) {
+                        //        if (data.stage == "Lab送出資料") {
+                        //            $("#sigQC").css("display", "");
+                        //            console.log("6");
+                        //        }
+                        //    }
+                        //}
+                    });
+                this.GetPdf();
+                this.InitRecordTable();
+                //this.LoadPdfFromUrl('@Url.Content("~/Report/GetFile")');
+
+
+
+
+
+
+            },
+            methods: {
+                next() {
+                    console.log(report_Info.Cus_CT_ID);
+                    window.location.href = `@Url.Content("~/Report/Detail")?Id=${report_Info.Cus_CT_ID}&type=next`;
                 },
-                mounted() {
-                    //$.ajax({
-                    //    url: `@Url.Content("~/Report/Details")`,
-                    //    type: "post",
-                    //    dataType: "json",
-                    //    data: { Id: '@ViewBag.Id' }
-                    //})
-                    //    .done(data => {
-                    //        console.log(data);
-                    //    });
+                last() {
+                    console.log(report_Info.Cus_CT_ID);
+                    window.location.href = `@Url.Content("~/Report/Detail")?Id=${report_Info.Cus_CT_ID}&type=last`;
+                },
+                Release() {
+                    console.log("Release")
                     $.ajax({
-                        url: `@Url.Content("~/Report/Details")`,
+                        url: `@Url.Content("~/Report/Release")`,
                         type: "post",
                         dataType: "json",
-                        data: { Id: '@ViewBag.Id' }
+                        data: {
+                            Id: '@ViewBag.Id',
+                            type: report_Info.ProductType,
+                            stage: report_Info.Status
+                        }
                     })
                         .done(data => {
                             console.log(data);
-                            report_Info.name = data.motheR_NAME;
-                            report_Info.Cus_CT_ID = data.cus_ct_id;
-                            report_Info.ReportDate = data.final_Date;
-                            report_Info.Status = data.stage;
-                            report_Info.ProductType = data.productType;
-                            if (data.hla != "Y") {
-                                $(".HLA").css("display", "none");
+                            if (data == "OK") {
+                                var cookie_sendUploadNoty = report_Info.getCookie("cookie_sendUploadNoty");
+                                if (cookie_sendUploadNoty == "" || cookie_sendUploadNoty == null) {
+                                    let datastr = report_Info.Cus_CT_ID + "%";
+                                    report_Info.setCookie("cookie_sendUploadNoty", datastr);
+                                }
+                                else {
+                                    cookie_sendUploadNoty += report_Info.Cus_CT_ID + "%";
+                                    report_Info.setCookie("cookie_sendUploadNoty", cookie_sendUploadNoty);
+                                }
+                                location.reload();
                             }
-                            const Stu = $(`#reportStu p:contains('${data.stage}')`);
-                            Stu.parent("div").css("background-color", " #1DC9B7")
-                            Stu.parent("div").prevAll("div").css("background-color", "#1DC9B7")
-
-                            if (data.productType == "MSC" || data.productType == "ADSC" || data.productType == "TSC") {
-                                if (DEPARTMENT == "細胞實驗室" && RANK == "部門主管") {
-                                    if (data.stage == "品質主管複核") {
-                                        $("#sigLAB").css("display", "");
-                                        console.log("1");
-                                    }
-                                    else if (data.stage == "簽核完成") {
-                                        $("#release").css("display", "");
-                                        console.log("2");
-                                    }
-                                }
-                                else if (DEPARTMENT == "造血實驗室" && RANK == "部門主管") {
-                                    if (data.stage == "Lab送出資料") {
-                                        $("#sigQC").css("display", "");
-                                        console.log("3");
-                                    }
-                                }
-                            }
-                            else if (data.productType == "CB" || data.productType == "PBSC") {
-                                if (DEPARTMENT == "造血實驗室" && RANK == "部門主管") {
-                                    if (data.stage == "品質主管複核") {
-                                        $("#sigLAB").css("display", "");
-                                        console.log("4");
-                                    }
-                                    else if (data.stage == "簽核完成") {
-                                        $("#release").css("display", "");
-                                        console.log("5");
-                                    }
-                                }
-                                else if (DEPARTMENT == "細胞實驗室" && RANK == "部門主管") {
-                                    if (data.stage == "Lab送出資料") {
-                                        $("#sigQC").css("display", "");
-                                        console.log("6");
-                                    }
-                                }
+                            else {
+                                toastr.error("錯誤", data, {
+                                    timeOut: 0
+                                });
                             }
                         });
-                    this.InitRecordTable();
                 },
-                methods: {
-                    next() {
-                        console.log(report_Info.Cus_CT_ID);
-                        window.location.href = `@Url.Content("~/Report/Detail")?Id=${report_Info.Cus_CT_ID}&type=next`;
-                    },
-                    last() {
-                        console.log(report_Info.Cus_CT_ID);
-                        window.location.href = `@Url.Content("~/Report/Detail")?Id=${report_Info.Cus_CT_ID}&type=last`;
-                    },
-                    Release() {
-                        console.log("Release")
-                        $.ajax({
-                            url: `@Url.Content("~/Report/Release")`,
-                            type: "post",
-                            dataType: "json",
-                            data: {
-                                Id: '@ViewBag.Id',
-                                type: report_Info.ProductType,
-                                stage: report_Info.Status
+                Sign_Lab() {
+                    console.log("Sign_Lab")
+                    console.log(report_Info.reply_remark_keyIn);
+                    $.ajax({
+                        url: `@Url.Content("~/Report/SingLAB")`,
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            Id: '@ViewBag.Id',
+                            type: report_Info.ProductType,
+                            stage: report_Info.Status,
+                            ReplyRemark: report_Info.reply_remark_keyIn,
+                        }
+                    })
+                        .done(data => {
+                            console.log(data);
+                            if (data == "OK") {
+
+                                location.reload();
                             }
-                        })
-                            .done(data => {
-                                console.log(data);
-                                if (data == "OK") {
-                                    location.reload();
-                                }
-                                else {
-                                    toastr.error("錯誤", data, {
-                                        timeOut: 0
-                                    });
-                                }
-                            });
-                    },
-                    Sign_Lab() {
-                        console.log("Sign_Lab")
-                        $.ajax({
-                            url: `@Url.Content("~/Report/SingLAB")`,
-                            type: "post",
-                            dataType: "json",
-                            data: {
-                                Id: '@ViewBag.Id',
-                                type: report_Info.ProductType,
-                                stage: report_Info.Status
-                            }
-                        })
-                            .done(data => {
-                                console.log(data);
-                                if (data == "OK") {
-                                    location.reload();
-                                }
-                                else {
-                                    toastr.error("錯誤", data, {
-                                        timeOut: 0
-                                    });
-                                }
-                            });
-                    },
-                    Sign_QC() {
-                        console.log("Sign_QC")
-                        $.ajax({
-                            url: `@Url.Content("~/Report/SingQC")`,
-                            type: "post",
-                            dataType: "json",
-                            data: {
-                                Id: '@ViewBag.Id',
-                                type: report_Info.ProductType,
-                                stage: report_Info.Status
-                            }
-                        })
-                            .done(data => {
-                                console.log(data);
-                                if (data == "OK") {
-                                    location.reload();
-                                }
-                                else {
-                                    toastr.error("錯誤", data, {
-                                        timeOut: 0
-                                    });
-                                }
-                            });
-                    },
-                    InitRecordTable() {
-                        var _this = this;
-                        _this.RecordTable = $("#RecordTable").DataTable({
-                            searching: false,
-                            autoWidth: false,
-                            //scrollX: true,
-                            //lengthChange: false,
-                            //pageLength: 10,
-                            responsive: false,
-                            deferRender: true,
-                            ordering: true,
-                            order: [[0, 'asc']],
-                            columnDefs: [
-                            ],
-                            //lengthMenu: [50],
-                            language: {
-                                url: `@Url.Content("~/lang/dataTables/tw.json")`
-                            },
-                            dom: `<'row'<'col-sm-12'tr>>`,
-                            columns: [
-                                {
-                                    data: "datetime",
-                                    //render: function (data) {
-                                    //    if (data != "") {
-                                    //        return moment.utc(data).local().format('YYYY/MM/DD HH:mm:ss');
-                                    //    }
-                                    //    return "";
-                                    //}
-                                },
-                                {
-                                    data: "emp_id"
-                                },
-                                {
-                                    data: "stage",
-                                },
-                                {
-                                    data: "state",
-                                },
-                                {
-                                    data: "remark",
-                                    sortable: false
-                                },
-                            ],
-                            ajax: {
-                                url: `@Url.Content("~/Report/DetailsSingeRecord")`,
-                                dataSrc: "",
-                                async: true,
-                                cache: false,
-                                type: "POST",
-                                data: { Id: '@ViewBag.Id' },
-                                beforeSend() {
-                                    //_this.ContantUsApps = [];
-                                }
+                            else {
+                                toastr.error("錯誤", data, {
+                                    timeOut: 0
+                                });
                             }
                         });
+                },
+                Sign_QC() {
+                    console.log("Sign_QC")
+                    console.log(report_Info.reply_remark_keyIn);
+                    $.ajax({
+                        url: `@Url.Content("~/Report/SingQC")`,
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            Id: '@ViewBag.Id',
+                            type: report_Info.ProductType,
+                            stage: report_Info.Status,
+                            ReplyRemark: report_Info.reply_remark_keyIn,
+                        }
+                    })
+                        .done(data => {
+                            console.log(data);
+                            if (data == "OK") {
+                                var cookie_sendNoty = report_Info.getCookie("cookie_sendNoty");
+                                if (cookie_sendNoty == "" || cookie_sendNoty == null) {
+                                    let datastr = report_Info.Cus_CT_ID + "%";
+                                    report_Info.setCookie("cookie_sendNoty", datastr);
+                                }
+                                else {
+                                    cookie_sendNoty += report_Info.Cus_CT_ID + "%";
+                                    report_Info.setCookie("cookie_sendNoty", cookie_sendNoty);
+                                }
+                                location.reload();
+                            }
+                            else {
+                                toastr.error("錯誤", data, {
+                                    timeOut: 0
+                                });
+                            }
+                        });
+                },
+                // RenderPage(pdf_container, num) {
+                //     pdfDoc.getPage(num).then(function (page) {
+                //         //Create Canvas element and append to the Container DIV.
+                //         var canvas = document.createElement('canvas');
+                //         canvas.id = 'pdf-' + num;
+                //         ctx = canvas.getContext('2d');
+                //         pdf_container.appendChild(canvas);
 
-                    },
-                }
-            })
-        </script>
-    }
+                //         //Create and add empty DIV to add SPACE between pages.
+                //         var spacer = document.createElement("div");
+                //         spacer.style.height = "20px";
+                //         pdf_container.appendChild(spacer);
+
+                //         //Set the Canvas dimensions using ViewPort and Scale.
+                //         var viewport = page.getViewport({ scale: scale });
+                //         canvas.height = resolution * viewport.height;
+                //         canvas.width = resolution * viewport.width;
+
+                //         //Render the PDF page.
+                //         var renderContext = {
+                //             canvasContext: ctx,
+                //             viewport: viewport,
+                //             transform: [resolution, 0, 0, resolution, 0, 0]
+                //         };
+                //         page.render(renderContext);
+                //     });
+                // },
+                LoadPdfFromUrl(url, eleID) {
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
+                    //Read PDF from URL.
+                    pdfjsLib.getDocument(url).promise.then(function (pdfDoc_) {
+                        pdfDoc = pdfDoc_;
+
+                        //Reference the Container DIV.
+                        var pdf_container = document.getElementById(eleID);
+                        pdf_container.style.display = "block";
+
+                        //Loop and render all pages.
+                        for (var i = 1; i <= pdfDoc.numPages; i++) {
+                            //RenderPage(pdf_container, i);
+
+                            pdfDoc.getPage(i).then(function (page) {
+                                //Create Canvas element and append to the Container DIV.
+                                var canvas = document.createElement('canvas');
+                                canvas.id = 'pdf-' + i;
+                                ctx = canvas.getContext('2d');
+                                pdf_container.appendChild(canvas);
+
+                                //Create and add empty DIV to add SPACE between pages.
+                                var spacer = document.createElement("div");
+                                spacer.style.height = "20px";
+                                pdf_container.appendChild(spacer);
+
+                                //Set the Canvas dimensions using ViewPort and Scale.
+                                var viewport = page.getViewport({ scale: scale });
+                                canvas.height = resolution * viewport.height;
+                                canvas.width = resolution * viewport.width;
+
+                                //Render the PDF page.
+                                var renderContext = {
+                                    canvasContext: ctx,
+                                    viewport: viewport,
+                                    transform: [resolution, 0, 0, resolution, 0, 0]
+                                };
+                                page.render(renderContext);
+                            });
+
+                        }
+                    });
+                },
+                GetPdf() {
+                    $.ajax({
+                        url: `@Url.Content("~/Report/GetPdfUrl")`,
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            Id: '@ViewBag.Id'
+                        },
+                        beforeSend: function (xmlHttp) {
+                            xmlHttp.setRequestHeader("If-Modified-Since", "0");
+                            xmlHttp.setRequestHeader("Cache-Control", "no-cache");
+                        }
+                    })
+                        .done(data => {
+                            console.log(data);
+                            var current = data.currentReports;
+                            var history = data.historyReports;
+                            var upload = data.uploadReports;
+                            var url = '@Url.Content("~/Report/GetFile")' + "?url="
+                            if (current.length > 0) {
+                                for (let i = 0; i <= current.length - 1; i++) {
+                                    //current[i] += `?q=` + Math.floor(Math.random() * (1000 - 1 + 1)) + 1
+                                    report_Info.LoadPdfFromUrl(url + current[i], "current_pdf_container")
+                                }
+                            }
+                            if (history.length > 0) {
+                                for (let i = 0; i <= history.length - 1; i++) {
+                                    //history[i] += `?q=` + Math.floor(Math.random() * (1000 - 1 + 1)) + 1
+                                    report_Info.LoadPdfFromUrl(url + history[i], "history_pdf_container")
+                                }
+                            }
+                            if (upload.length > 0) {
+                                for (let i = 0; i <= upload.length - 1; i++) {
+                                    //upload[i] += `?q=` + Math.floor(Math.random() * (1000 - 1 + 1)) + 1
+                                    report_Info.LoadPdfFromUrl(url + upload[i], "upload_pdf_container")
+                                }
+                                //$("#uploadsplit").append(`<hr><h5 style="margin-left:15px">已上傳報告</h5>`);
+                            }
+                            //report_Info.currentReports = current;//data.currentReports;
+                            //report_Info.historyReports = history;//data.historyReports;
+                            //report_Info.uploadReports = upload;//data.historyReports;
+                        });
+                },
+                SendToLab() {
+                    var msg = report_Info.reply_remark_keyIn;
+                    if (msg == "" || msg == null) {
+                        return;
+                    }
+                    $.ajax({
+                        url: `@Url.Content("~/Report/SendToLab")`,
+                        type: "post",
+                        data: {
+                            Id: report_Info.Cus_CT_ID,
+                            ReplyRemark: report_Info.reply_remark_keyIn
+                        },
+                        success: function (result) {
+                            toastr.info("", result, { timeOut: 2000 });
+                            location.reload();
+                        },
+                        error: function (err) {
+                            toastr.error("", err.responseText, { timeOut: 0 });
+                        }
+                    });
+
+
+                },
+                setCookie(name, value) {
+                    var Days = 1;
+                    var exp = new Date();
+                    exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+                    document.cookie = name + "=" + encodeURI(value) + ";expires=" + exp.toGMTString();
+                },
+                getCookie(name) {
+                    var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+                    if (arr = document.cookie.match(reg)) {
+                        return decodeURI(arr[2]);
+                    } else {
+                        return null;
+                    }
+                },
+                delCookie(name) {
+                    var exp = new Date();
+                    exp.setTime(exp.getTime() - 1);
+                    var cval = getCookie(name);
+                    if (cval != null) {
+                        document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+                    }
+                },
+
+
+                InitRecordTable() {
+                    var _this = this;
+                    _this.RecordTable = $("#RecordTable").DataTable({
+                        searching: false,
+                        autoWidth: false,
+                        //scrollX: true,
+                        //lengthChange: false,
+                        pageLength: 1000,
+                        responsive: false,
+                        deferRender: true,
+                        ordering: true,
+                        order: [[0, 'asc']],
+                        columnDefs: [
+                        ],
+                        //lengthMenu: [50],
+                        language: {
+                            url: `@Url.Content("~/lang/dataTables/tw.json")`
+                        },
+                        dom: `<'row'<'col-sm-12'tr>>`,
+                        columns: [
+                            {
+                                data: "datetime",
+                                //render: function (data) {
+                                //    if (data != "") {
+                                //        return moment.utc(data).local().format('YYYY/MM/DD HH:mm:ss');
+                                //    }
+                                //    return "";
+                                //}
+                            },
+                            {
+                                data: "emp_id"
+                            },
+                            {
+                                data: "stage",
+                            },
+                            {
+                                data: "state",
+                            },
+                            {
+                                data: "remark",
+                                sortable: false
+                            },
+                        ],
+                        ajax: {
+                            url: `@Url.Content("~/Report/DetailsSingeRecord")`,
+                            dataSrc: "",
+                            async: true,
+                            cache: false,
+                            type: "POST",
+                            data: { Id: '@ViewBag.Id' },
+                            beforeSend() {
+                                //_this.ContantUsApps = [];
+                            }
+                        }
+                    });
+
+                },
+            }
+        })
+    </script>
+}

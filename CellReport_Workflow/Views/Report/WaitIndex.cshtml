@@ -133,8 +133,19 @@
                         <vue-button class="mr-2" icon="fa-file-pdf" color="info" v-on:click="GetAllPDF" id="download">
                             批次觀看
                         </vue-button>
+                        <vue-button class="mr-2" icon="fa-file-edit" color="info" v-on:click="GetAllSign" id="sign">
+                            批次簽核
+                        </vue-button>
                         <vue-button icon="fa-upload" color="info" v-on:click="UploadReport" id="upload">
                             批次上傳
+                        </vue-button>
+                        <vue-button class="mr-2" icon=".fa-comment" color="info" style="display:none" v-on:click="SendNext" id="btnNext">
+                            通知下階段簽核
+                            <span class="badge bg-danger-800 ml-2" id="sendNum">{{sendNum}}</span>
+                        </vue-button>
+                        <vue-button icon=".fa-comment" color="info" style="display:none" v-on:click="SendUpload" id="btnSendUpload">
+                            發送上傳通知
+                            <span class="badge bg-danger-800 ml-2" id="uploadNum">{{uploadNum}}</span>
                         </vue-button>
                     </h2>
                 </div>
@@ -145,9 +156,13 @@
                                 <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.Id" @* v-on:keyup="GetSurveyTableList"*@>
                                     客戶代號
                                 </vue-input>
-                                <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.ProductType" @*v-on:keyup="GetSurveyTableList"*@>
+                                @* <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.ProductType">
+                                產品別
+                                </vue-input>*@
+                                <vue-select class="col-lg-3 col-md-3 mb-1" v-model="Filter.ProductType" @*v-on:change="GetSurveyTableList"*@
+                                            v-bind:options="ProductTypeOptions">
                                     產品別
-                                </vue-input>
+                                </vue-select>
                                 <vue-select class="col-lg-3 col-md-3 mb-1" v-model="Filter.Status" @*v-on:change="GetSurveyTableList"*@
                                             v-bind:options="StatusOptions">
                                     簽核狀態
@@ -169,18 +184,18 @@
                     </div>
 
                     <table id="surveyTable" class="table table-bordered table-hover table-striped w-100">
-                        <thead>
-                            <tr>
-                                <th>內容</th>
-                                <th>客戶代號</th>
-                                <th>姓名</th>
-                                <th>完成日</th>
-                                <th>產品別</th>
-                                <th>簽核狀態</th>
-                            </tr>
+                        @*<thead>
+                        <tr>
+                        <th>內容</th>
+                        <th>客戶代號</th>
+                        <th>姓名</th>
+                        <th>完成日</th>
+                        <th>產品別</th>
+                        <th>簽核狀態</th>
+                        </tr>
                         </thead>
                         <tbody>
-                        </tbody>
+                        </tbody>*@
                     </table>
                 </div>
             </div>
@@ -215,32 +230,56 @@
                         { "text": "簽核完成", "value": "簽核完成" },
                         { "text": "報告上傳", "value": "報告上傳" }
                     ],
+                    ProductTypeOptions: [
+                        { "text": "請選擇", "value": "" },
+                        { "text": "ADSC", "value": "ADSC" },
+                        { "text": "CB", "value": "CB" },
+                        { "text": "MSC", "value": "MSC" },
+                        { "text": "PBSC", "value": "PBSC" },
+                        { "text": "TSC", "value": "TSC" }
+                    ],
                     Filter: {
                         Id: "",
                         ProductType: "",
                         Status: "",
                         Finish_s: "",
                         Finish_e: "",
-                    }
+                    },
+                    sendNum: "",
+                    uploadNum: "",
                 },
                 components: {
                     loading: VueLoading
                 },
                 mounted() {
-                    if (RANK != "部門主管") {
-                        $("#download, #upload").css("display", "none");
+                    if (RANK != SYSRANK.LAB) {
+                        $("#upload").css("display", "none");
                     }
-
+                    if (RANK == SYSRANK.QC || RANK == SYSRANK.LAB) {
+                        $("#sign").css("display", "");
+                    }
+                    else {
+                        $("#sign").css("display", "none");
+                    }
                     this.InitSurveyTable();
                 },
                 methods: {
                     Search() {
-                        console.log(this.Filter);
                         $("#surveyTable").DataTable().destroy();
                         $('#surveyTable').empty();
                         this.InitSurveyTable();
                     },
                     OpenResultUrl(e) {
+                        var cusId = surveyList.SurveyTable.rows({ selected: true }).data();
+                        var str = "";
+                        for (let i = 0; i <= cusId.length - 1; i++) {
+                            str += cusId[i].cus_ct_id + "%";
+                        }
+                        if (str.endsWith("%")) {
+                            str = str.replace(/%+$/, '')
+                        }
+
+                        this.setCookie("cookie_DataSelect_Waiting", str);
                         var id = $(e.currentTarget).siblings("input.hiddenDemoData").val();
                         window.location.assign('@Url.Content("~/Report/Detail")' + `?Id=${id}`);
                     },
@@ -250,48 +289,337 @@
                     GetSurveyTableDraw() {
                         this.SurveyTable.ajax.reload(null, false)
                     },
-                    GetAllPDF() {
-                        let output = this.GetCheck();
-                        console.log(output);
+                    GetAllPDF() {  //==================批次下載
+                        let output = this.GetCheck_ID();
                         $.ajax({
                             url: `@Url.Content("~/Report/GetAllPDF")`,
                             type: "post",
-                            dataType: "json",
+                            //dataType: "json",
                             data: {
                                 datas: output
                             },
-                        })
-                            .done(data => {
-                                console.log(data);
-                            });
-                    },
-                    UploadReport() {
-                        let output = this.GetCheck();
-                        console.log(output);
-                        $.ajax({
-                            url: `@Url.Content("~/Report/UploadReport")`,
-                            type: "post",
-                            dataType: "json",
-                            data: {
-                                datas: output
+                            success: function (data) {
+                                toastr.info("", "PDF合併完成，檔案下載中...", { timeOut: 2000 });
+                                window.location.href = `@Url.Content("~/Report/Download")/?TempPath=${data}`;
                             },
-                        })
-                            .done(data => {
-                                console.log(data);
-                            });
-                    },
-                    GetCheck() {
-                        let checkboxs = document.querySelectorAll("input[type='checkbox']:checked");
-                        let output = [];
-                        checkboxs.forEach((checkbox) => {
-                            output.push(checkbox.name);
+                            error: function (err) {
+                                toastr.error("", err.responseText, { timeOut: 0 });
+                            }
                         });
+                    },
+                    UploadReport() { //==================批次上傳
+                        let output = this.GetCheck_ID();
+                        let output_Stage = this.GetCheck_stage();
+                        var str = "";
+                        if (RANK == SYSRANK.LAB) {
+                            for (let i = 0; i <= output_Stage.length - 1; i++) {
+                                if (output_Stage[i] != STATUS.SING_FINISH) {
+                                    //this.SurveyTable.rows(`:eq(${index})`, { page: 'All' }).deselect();
+                                    str += `${output[i]}, <br>`
+                                }
+                            }
+                            if (str.length > 0) {
+                                str += "無法上傳 <br>上傳動作已取消。";
+                                toastr.warning("", str, { timeOut: 0 });
+                                return;
+                            }
+                            else {
+                                $.ajax({
+                                    url: `@Url.Content("~/Report/UploadReport")`,
+                                    type: "post",
+                                    data: { datas: output },
+                                    success: function (data) {
+                                        // toastr.info("", data, { timeOut: 2000 });
+                                        // surveyList.GetSurveyTableList();
+
+
+                                        var cookie_sendUploadNoty = surveyList.getCookie("cookie_sendUploadNoty");
+                                        if (cookie_sendUploadNoty == "" || cookie_sendUploadNoty == null) {
+                                            let datastr = ""
+                                            for (let i = 0; i <= output.length - 1; i++) {
+                                                datastr += output[i] + "%";
+                                            }
+                                            surveyList.setCookie("cookie_sendUploadNoty", datastr);
+                                        }
+                                        else {
+                                            for (let i = 0; i <= output.length - 1; i++) {
+                                                cookie_sendUploadNoty += data[i] + "%";
+                                            }
+                                            surveyList.setCookie("cookie_sendUploadNoty", cookie_sendUploadNoty);
+                                        }
+                                        toastr.info("", data, { timeOut: 2000 });
+                                        surveyList.GetSurveyTableList();
+                                        surveyList.SetUploadNum();
+                                    },
+                                    error: function (err) {
+                                        toastr.error("", err.responseText, { timeOut: 0 });
+                                        surveyList.GetSurveyTableList();
+                                    }
+                                });
+                            }
+                        }
+                        else {
+                            return;
+                        }
+                    },
+                    GetAllSign() {  //==================批次簽核
+                        //let output_all = this.GetAllRows();
+                        let output = this.GetCheck_ID();
+                        let output_Stage = this.GetCheck_stage();
+                        let str = "";
+
+                        if (RANK == SYSRANK.QC) {
+                            for (let i = 0; i <= output_Stage.length - 1; i++) {
+                                if (output_Stage[i] != STATUS.LAB_SEND) {
+                                    //this.SurveyTable.rows(index).deselect();
+                                    str += `${output[i]}, <br>`
+                                }
+                            }
+                            if (str.length > 0) {
+                                str += "無法簽核 <br>簽核動作已取消。";
+                                toastr.warning("", str, { timeOut: 0 });
+                                return;
+                            }
+                            else {
+                                this.QC_SIGN_All(output);
+                            }
+                        }
+                        else if (RANK == SYSRANK.LAB) {
+                            for (let i = 0; i <= output_Stage.length - 1; i++) {
+                                if (output_Stage[i] != STATUS.QC_SING) {
+                                    //this.SurveyTable.rows(`:eq(${index})`, { page: 'All' }).deselect();
+                                    str += `${output[i]}, <br>`
+                                }
+                            }
+                            if (str.length > 0) {
+                                str += "無法簽核 <br>簽核動作已取消。";
+                                toastr.warning("", str, { timeOut: 0 });
+                                return;
+                            }
+                            else {
+                                this.LAB_SIGN_All(output);
+                            }
+                        }
+                        else {
+                            return;
+                        }
+                    },
+                    QC_SIGN_All(data) { //==================批次簽核QC
+                        $.ajax({
+                            url: `@Url.Content("~/Report/SingQC_All")`,
+                            type: "post",
+                            data: { datas: data },
+                            success: function (result) {
+                                // toastr.info("", result, { timeOut: 2000 });
+                                // surveyList.GetSurveyTableList();
+
+                                var cookie_sendNoty = surveyList.getCookie("cookie_sendNoty");
+                                if (cookie_sendNoty == "" || cookie_sendNoty == null) {
+                                    let datastr = ""
+                                    for (let i = 0; i <= data.length - 1; i++) {
+                                        datastr += data[i] + "%";
+                                    }
+                                    surveyList.setCookie("cookie_sendNoty", datastr);
+                                }
+                                else {
+                                    for (let i = 0; i <= data.length - 1; i++) {
+                                        cookie_sendNoty += data[i] + "%";
+                                    }
+                                    surveyList.setCookie("cookie_sendNoty", cookie_sendNoty);
+                                }
+                                toastr.info("", result, { timeOut: 2000 });
+                                surveyList.GetSurveyTableList();
+                                surveyList.SetSendNum();
+
+
+
+
+                            },
+                            error: function (err) {
+                                toastr.error("", err.responseText, { timeOut: 0 });
+                                surveyList.GetSurveyTableList();
+                            }
+                        });
+                    },
+                    LAB_SIGN_All(data) { //==================批次簽核LAB
+                        $.ajax({
+                            url: `@Url.Content("~/Report/SingLAB_All")`,
+                            type: "post",
+                            data: { datas: data },
+                            success: function (result) {
+                                toastr.info("", result, { timeOut: 2000 });
+                                surveyList.GetSurveyTableList();
+                            },
+                            error: function (err) {
+                                toastr.error("", err.responseText, { timeOut: 0 });
+                                surveyList.GetSurveyTableList();
+                            }
+                        });
+                    },
+                    GetAllRows() { //==================取得所有ID
+                        let output = [];
+                        this.SurveyTable.rows().data().map(obj => {
+                            output.push(obj.id)
+                        });
+                        if (output.length < 1) {
+                            return;
+                        }
                         return output;
                     },
+                    GetCheck_ID() { //==================取得所選ID
+                        let output = [];
+                        this.SurveyTable.rows({ selected: true }).data().map(obj => {
+                            output.push(obj.id)
+                        })
+                        if (output.length < 1) {
+                            toastr.warning("", "未選取任何資料", { timeOut: 3000 });
+                            return;
+                        }
+                        return output;
+                    },
+                    GetCheck_stage() {  //==================取得所選狀態
+                        let output = [];
+                        this.SurveyTable.rows({ selected: true }).data().map(obj => {
+                            output.push(obj.stage)
+                        })
+                        if (output.length < 1) {
+                            toastr.warning("", "未選取任何資料", { timeOut: 3000 });
+                            return;
+                        }
+                        return output;
+                    },
+                    setCookie(name, value) {
+                        var Days = 1;
+                        var exp = new Date();
+                        exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+                        document.cookie = name + "=" + encodeURI(value) + ";expires=" + exp.toGMTString();
+                    },
+                    getCookie(name) {
+                        var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+                        if (arr = document.cookie.match(reg)) {
+                            return decodeURI(arr[2]);
+                        } else {
+                            return null;
+                        }
+                    },
+                    delCookie(name) {
+                        var exp = new Date();
+                        exp.setTime(exp.getTime() - 1);
+                        var cval = getCookie(name);
+                        if (cval != null) {
+                            document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+                        }
+                    },
+                    SeleIndexByID(cus_ct_id) {
+                        var id = this.SurveyTable
+                            .row(function (idx, data, node) {
+                                if (data.cus_ct_id === cus_ct_id)
+                                    return true;
+                                else
+                                    return false;
+                            }).index();
+                        console.log(`index = ${id}`);
+                        if (id != null) {
+                            this.SurveyTable.row(id).select();
+                        }
+                        else {
+                            console.log(`Can't find ${cus_ct_id}`)
+                        }
+                    },
+
+                    SetUploadNum() {  //通知上傳(資料)
+                        var cookie_sendUploadNoty = this.getCookie("cookie_sendUploadNoty");
+                        if (cookie_sendUploadNoty == "" || cookie_sendUploadNoty == null) {
+                            this.uploadNum = "";
+                            $("#btnSendUpload").css("display", "none");
+                        }
+                        else {
+                            if (cookie_sendUploadNoty.endsWith("%")) {
+                                cookie_sendUploadNoty = cookie_sendUploadNoty.replace(/%+$/, '');
+                            }
+                            var datas = cookie_sendUploadNoty.split('%');
+                            console.log("cookie_sendUploadNoty: " + datas.length);
+                            $("#btnSendUpload").css("display", "");
+                            this.uploadNum = datas.length;
+                        }
+                    },
+                    SetSendNum() {  //通知簽核(資料)
+                        var cookie_sendNoty = this.getCookie("cookie_sendNoty");
+                        if (cookie_sendNoty == "" || cookie_sendNoty == null) {
+                            this.sendNum = ""
+                            $("#btnNext").css("display", "none");
+                        }
+                        else {
+                            if (cookie_sendNoty.endsWith("%")) {
+                                cookie_sendNoty = cookie_sendNoty.replace(/%+$/, '');
+                            }
+                            var datas = cookie_sendNoty.split('%');
+                            console.log("cookie_sendNoty: " + datas.length);
+                            $("#btnNext").css("display", "");
+                            this.sendNum = datas.length;
+                        }
+                    },
+
+
+
+                    SendNext() {
+                        var cookie_sendNoty = this.getCookie("cookie_sendNoty");
+                        if (cookie_sendNoty.endsWith("%"))
+                            cookie_sendNoty = cookie_sendNoty.replace(/%+$/, '');
+                        var datas = cookie_sendNoty.split('%');
+                        $.ajax({
+                            url: `@Url.Content("~/Report/SendNext")`,
+                            type: "post",
+                            data: { datas_ID: datas },
+                            success: function (result) {
+                                toastr.info("", result, { timeOut: 2000 });
+                                surveyList.delCookie("cookie_sendNoty");
+                                surveyList.SetSendNum();
+                                //surveyList.GetSurveyTableList();
+                            },
+                            error: function (err) {
+                                toastr.error("", err.responseText, { timeOut: 0 });
+                                surveyList.GetSurveyTableList();
+                            }
+                        });
+
+                    },
+                    SendUpload() {
+                        var cookie_sendUploadNoty = this.getCookie("cookie_sendUploadNoty");
+                        if (cookie_sendUploadNoty.endsWith("%"))
+                            cookie_sendUploadNoty = cookie_sendUploadNoty.replace(/%+$/, '');
+                        var datas = cookie_sendUploadNoty.split('%');
+                        $.ajax({
+                            url: `@Url.Content("~/Report/SendUpload")`,
+                            type: "post",
+                            data: { datas_ID: datas },
+                            success: function (result) {
+                                toastr.info("", result, { timeOut: 2000 });
+                                surveyList.delCookie("cookie_sendUploadNoty");
+                                surveyList.SetUploadNum();
+                                //surveyList.GetSurveyTableList();
+                            },
+                            error: function (err) {
+                                toastr.error("", err.responseText, { timeOut: 0 });
+                                surveyList.GetSurveyTableList();
+                            }
+                        });
+                    },
+
+
+
+
+
                     GetSurveyTableList() {
-                        this.SurveyTable.ajax.reload();
+                        var cusid = surveyList.SurveyTable.rows({ selected: true }).data();
+                        this.SurveyTable.ajax.reload(function () {
+                            for (let i = 0; i < cusid.length; i++) {
+                                surveyList.SeleIndexByID(cusid[i].cus_ct_id);
+                            }
+                        }, false);
                     },
                     InitSurveyTable() {
+                        $('#surveyTable').append(`<thead><tr><th><input type="checkbox" class="select_all" id="Select_All" style="margin-left:40%"></th><th>內容</th><th>客戶代號</th><th>姓名</th><th>完成日</th> <th>產品別</th><th>簽核狀態</th><th>執行人員</th></tr></thead>`);
                         var _this = this;
                         _this.SurveyTable = $("#surveyTable").DataTable({
 
@@ -304,13 +632,34 @@
                             deferRender: true,
                             ordering: true,
                             order: [[1, 'asc']],
-                            columnDefs: [
-                            ],
+                            columnDefs: [],
                             lengthMenu: [10],
                             language: {
                                 url: `@Url.Content("~/lang/dataTables/tw.json")`
                             },
+                            select: { style: 'multi' },
+                            initComplete: function (settings, json) {
+                                var cookie_data = _this.getCookie("cookie_DataSelect_Waiting");
+                                if (cookie_data != null) {
+                                    if (cookie_data != "") {
+                                        var datas = cookie_data.split('%');
+                                        for (let i = 0; i <= datas.length; i++) {
+                                            _this.SeleIndexByID(datas[i]);
+                                        }
+                                    }
+                                    _this.delCookie("cookie_DataSelect_Waiting");
+                                }
+                            },
                             columns: [
+                                {
+                                    data: "id",
+                                    render: function (data, type, row) {
+                                        var reply = ``// '<i class="fa fa-list rowIcon" title="內容"></i>'
+                                        return reply //+ link
+                                    },
+                                    sortable: false,
+                                    className: 'select-checkbox'
+                                },
                                 {
                                     data: "id",
                                     render: function (data, type, row) {
@@ -320,22 +669,37 @@
                                     sortable: false
                                 },
                                 {
+                                    //title: "客戶代號",
                                     data: "cus_ct_id",
                                     render: function (data) {
                                         return data;
-                                    }
+                                    },
+                                    className: 'ID_Data'
                                 },
                                 {
+                                    //title: "姓名",
                                     data: "motheR_NAME",
                                 },
                                 {
+                                    //title: "完成日",
                                     data: "final_Date",
                                 },
                                 {
+                                    //title: "產品別",
                                     data: "productType",
                                 },
                                 {
+                                    //title: "簽核狀態",
                                     data: "stage",
+                                    render: function (data, type, row) {
+                                        return `${data} - ${row['whoSign']}`
+                                    },
+                                    sortable: true
+                                },
+                                {
+                                    //title: "簽核狀態",
+                                    data: "whoSign",
+
                                     sortable: true
                                 },
                             ],
@@ -353,9 +717,7 @@
                                     Finish_s: _this.Filter.Finish_s,
                                     Finish_e: _this.Filter.Finish_e
                                 },
-                                beforeSend() {
-                                    //_this.ContantUsApps = [];
-                                }
+                                beforeSend() { }
                             },
                             createdRow(row, data, index) {
                                 var hidden = $('<input/>', {
@@ -363,38 +725,21 @@
                                     value: data.cus_ct_id,
                                     class: 'hiddenDemoData'
                                 });
-                                $('td', row).eq(0).append(hidden);
-
-                                if (data.stage == "簽核完成") {
-                                    if (DEPARTMENT == "細胞實驗室" && RANK == "部門主管") {
-                                        if (data.productType == "ADSC" || data.productType == "MSC" || data.productType == "TSC") {
-                                            console.log(data.productType);
-                                            var CheckBox = $('<input/>', {
-                                                type: 'checkbox',
-                                                class: 'ustom-control-input check',
-                                                style: 'margin-left:20%; width:40px',
-                                                name: data.cus_ct_id
-                                            });
-                                            $('td', row).eq(0).append(CheckBox);
-                                        }
-                                    }
-                                    else if (DEPARTMENT == "造血實驗室" && RANK == "部門主管") {
-                                        if (data.productType == "CB" || data.productType == "PBSC") {
-                                            var CheckBox = $('<input/>', {
-                                                type: 'checkbox',
-                                                class: 'ustom-control-input check',
-                                                style: 'margin-left:20%; width:40px',
-                                                name: data.cus_ct_id
-                                            });
-                                            $('td', row).eq(0).append(CheckBox);
-                                        }
-                                    }
-                                }
+                                $('td', row).eq(1).append(hidden);
+                                $(row).attr('id', data.cus_ct_id);
                             }
                         });
                         $('#surveyTable tbody').on('click', '.fa-list', this.OpenResultUrl);
-                    },
+                        $("#Select_All").on('click', function () {
+                            if ($('#Select_All').is(":checked"))
+                                _this.SurveyTable.rows().select();
+                            else
+                                _this.SurveyTable.rows().deselect();
+                        });
 
+                        _this.SetUploadNum();
+                        _this.SetSendNum();
+                    }
                 }
             });
         });

@@ -11,6 +11,7 @@ namespace CellReport_Workflow.Models.Modify
 {
     public class Modify_ADO
     {
+
         SqlBase sqlBase = new();
         ModifyFactory ModifyFactory = new();
         Report_ADO Report_ADO = new();
@@ -26,7 +27,7 @@ namespace CellReport_Workflow.Models.Modify
             }
             else if (reportInfo.ProductType == "CB" || reportInfo.ProductType == "PBSC")
             {
-                labm = new User.UserFactory().GetLabManager(CDictionary.B_LAB); 
+                labm = new User.UserFactory().GetLabManager(CDictionary.B_LAB);
             }
 
             string sql = " INSERT INTO cr_Modify (cus_ct_id, Apply_Date, Apply_By, Reson, reply_By) VALUES (@K_cus_ct_id, @K_Apply_Date, @K_Apply_By, @K_Reson, @K_reply_By) ";
@@ -43,16 +44,25 @@ namespace CellReport_Workflow.Models.Modify
         }
         public string Updata_ModifyReply(string Id, string reply, string reply_remark, User.User user)
         {
-            string sql = " Update cr_Modify SET reply_Date = @K_reply_Date ,  reply_By = @K_reply_By , reply = @K_reply , reply_remark = @K_reply_remark ";
+            List<SqlParameter> Paras = new();
+            string sql = " Update cr_Modify SET reply_Date = @K_reply_Date   ";
+            sql += " ,  reply_By = @K_reply_By ";
+            sql += " , reply = @K_reply";
+            sql += " , reply_remark = @K_reply_remark";
+            //if (reply == "同意")
+            //{
+            //    sql += " ,Upload_Date = @K_Upload_Date ";
+            //    Paras.Add(new SqlParameter("K_Upload_Date", ""));
+            //}
+
             sql += " WHERE Id = @K_Id ";
-            List<SqlParameter> Paras = new()
-            {
-                new SqlParameter("K_Id", Id),
-                new SqlParameter("K_reply_Date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
-                new SqlParameter("K_reply_By", user.Emp_Id),
-                new SqlParameter("K_reply", reply),
-                new SqlParameter("K_reply_remark", reply_remark),
-            };
+
+            Paras.Add(new SqlParameter("K_Id", Id));
+            Paras.Add(new SqlParameter("K_reply_Date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
+            Paras.Add(new SqlParameter("K_reply_By", user.Emp_Id));
+            Paras.Add(new SqlParameter("K_reply", reply));
+            Paras.Add(new SqlParameter("K_reply_remark", reply_remark));
+
             string sta1 = sqlBase.SqlNonQuery(sql, Paras);
             Modify Modifydatas = ModifyFactory.GetModifyList("", "", "", "", Id)[0];
             if (reply == "同意")
@@ -85,7 +95,7 @@ namespace CellReport_Workflow.Models.Modify
                     List<SqlParameter> Paras2 = new() { new SqlParameter("K_Emp_Id", user.Emp_Id), new SqlParameter("K_PBSC_FULL_ID", info[2]) };
                     sta2 = sqlBase.SqlNonQuery(sql, Paras2);
                 }
-                //else
+                ////else
                 //{
                 //    return "ProductType ERR";
                 //}
@@ -94,9 +104,9 @@ namespace CellReport_Workflow.Models.Modify
                 sta4 = Record_ADO.Insert_cr_SignRecord(info[2], DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), Modifydatas.Apply_By, CDictionary.STAGE_MODIFY, "申請通過", "", "");
 
 
-                if (sta1 == CDictionary.OK && sta2 == CDictionary.OK && sta3 == CDictionary.OK) 
+                if (sta1 == CDictionary.OK/* && sta2 == CDictionary.OK*/ && sta3 == CDictionary.OK)
                     return sta1;
-                else 
+                else
                     return (sta1 + sta2 + sta3);
 
 

@@ -122,7 +122,7 @@
                         <vue-button class="mr-2" icon="fa-redo" color="info" v-on:click="GetSurveyTableDraw">
                             重新整理
                         </vue-button>
-                        <vue-button icon="fa-redo" color="info" v-on:click="GetSurveyTableDraw" data-toggle="modal" data-target="#Search_Report" id="btn_search">
+                        <vue-button icon="fa-file-edit" color="info" v-on:click="GetSurveyTableDraw" data-toggle="modal" data-target="#Search_Report" id="btn_search">
                             報告修正申請
                         </vue-button>
                     </h2>
@@ -134,9 +134,13 @@
                                 <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.Id" v-on:keyup="GetSurveyTableList">
                                     客戶代號
                                 </vue-input>
-                                <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.type" v-on:keyup="GetSurveyTableList">
+                                <vue-select class="col-lg-3 col-md-3 mb-1" v-model="Filter.type" @*v-on:change="GetSurveyTableList"*@
+                                            v-bind:options="ProductTypeOptions">
+                                    產品別
+                                </vue-select>
+                                @*<vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.type" v-on:keyup="GetSurveyTableList">
                                     報告類型
-                                </vue-input>
+                                </vue-input>*@
                                 @* <vue-select class="col-lg-3 col-md-3 mb-1" v-model="Filter.Status" v-on:change="GetSurveyTableList"
                                 v-bind:options="StatusOptions">
                                 簽核狀態
@@ -148,7 +152,7 @@
                     </div>
 
                     <table id="surveyTable" class="table table-bordered table-hover table-striped w-100">
-                        <thead>
+                        @*<thead>
                             <tr>
                                 <th>內容</th>
                                 <th>客戶代號</th>
@@ -159,7 +163,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                        </tbody>
+                        </tbody>*@
                     </table>
                 </div>
             </div>
@@ -230,7 +234,15 @@
                         Id: "",
                         type: "",
                         Status: "",
-                    }
+                    },
+                    ProductTypeOptions: [
+                        { "text": "請選擇", "value": "" },
+                        { "text": "ADSC", "value": "ADSC" },
+                        { "text": "CB", "value": "CB" },
+                        { "text": "MSC", "value": "MSC" },
+                        { "text": "PBSC", "value": "PBSC" },
+                        { "text": "TSC", "value": "TSC" }
+                    ],
                 },
                 components: {
                     loading: VueLoading
@@ -249,8 +261,9 @@
                 },
                 methods: {
                     Search() {
-                        surveyContent.ResetData();
-                        this.IsShow = false;
+                           $("#surveyTable").DataTable().destroy();
+                        $('#surveyTable').empty();
+                        this.InitSurveyTable();
                     },
                     Edit(e) {
                         SmartMessageBox({
@@ -283,6 +296,7 @@
                         this.SurveyTable.ajax.reload();
                     },
                     InitSurveyTable() {
+                        $('#surveyTable').append(`<thead><tr><th>內容</th><th>客戶代號</th><th>修改申請日</th><th>申請人</th> <th>申請修改原因</th><th>狀態</th></tr></thead>`);
                         var _this = this;
                         _this.SurveyTable = $("#surveyTable").DataTable({
 
@@ -296,7 +310,7 @@
                             deferRender: true,
                             //processing: true,
                             ordering: true,
-                            order: [[1, 'asc']],
+                            order: [[2, 'desc']],
                             columnDefs: [
                             ],
                             lengthMenu: [10],
@@ -306,6 +320,7 @@
 
                             columns: [
                                 {
+                                    //titel: "內容",
                                     data: "id",
                                     render: function (data, type, row) {
                                         var reply = '<i class="fa fa-list rowIcon" title="內容"></i>'
@@ -314,12 +329,14 @@
                                     sortable: false
                                 },
                                 {
+                                    //titel: "客戶代號",
                                     data: "cus_ct_id",
                                     render: function (data) {
                                         return data;
                                     }
                                 },
                                 {
+                                    //titel: "修改申請日",
                                     data: "apply_Date",
                                     render: function (data) {
                                         if (data != "") {
@@ -329,12 +346,15 @@
                                     }
                                 },
                                 {
-                                    data: "apply_By"
+                                    //titel: "申請人",
+                                    data: "apply_By_E"
                                 },
                                 {
+                                    //titel: "申請修改原因",
                                     data: "reson"
                                 },
                                 {
+                                    //titel: "狀態",
                                     data: "reply",
                                     render: function (data) {
                                         if (data == "") {
@@ -352,8 +372,10 @@
                                 async: true,
                                 cache: false,
                                 type: "POST",
-                                data: function data(d) {
-                                    d.Filter = JSON.stringify(_this.Filter);
+                                data:{
+                                    //d.Filter = JSON.stringify(_this.Filter);
+                                    Id: _this.Filter.Id,
+                                    ProductType: _this.Filter.type
                                 },
                                 beforeSend() {
                                     //_this.ContantUsApps = [];

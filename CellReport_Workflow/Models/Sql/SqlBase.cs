@@ -7,26 +7,32 @@ using System.Runtime.InteropServices;
 
 namespace CellReport_Workflow.Models.Sql
 {
-    public class SqlBase
+    public class SqlBase: ISql
     {
+        //private readonly IConfiguration _configuration;
         private string DB { get; } = "DB_TEST";
-        private string DB_Log { get; } = "Log";
+        private string DB_MAIL { get; } = "DB_MAIL";
+
         private string CONNSTR { get; set; }
         public string connstr
         {
             get { return CONNSTR; }
             private set { CONNSTR = value; }
         }
-        private string LOG_CONNSTR { get; set; }
-        public string log_connstr
+
+        private string MAIL_CONNSTR { get; set; }
+        public string mail_connstr
         {
-            get { return LOG_CONNSTR; }
-            private set { LOG_CONNSTR = value; }
+            get { return MAIL_CONNSTR; }
+            private set { MAIL_CONNSTR = value; }
         }
-        public SqlBase()
+        public SqlBase(/*IConfiguration configuration*/)
         {
+            //_configuration = configuration;
             this.connstr = GetConnstr(DB);
-            this.log_connstr = GetConnstr(DB_Log);
+            this.mail_connstr = GetConnstr(DB_MAIL);
+            //this.connstr = _configuration["ConnectionStrings:DB"];
+            //this.log_connstr = _configuration["ConnectionStrings:Log"];
         }
 
 
@@ -42,13 +48,35 @@ namespace CellReport_Workflow.Models.Sql
             return connstr;
         }
         public SqlConnection CONN_Builder() { return new(connstr); }
-        public SqlConnection LOG_CONN_Builder() { return new(log_connstr); }
+        public SqlConnection MAIL_CONN_Builder() { return new(mail_connstr); }
 
         public string SqlNonQuery(string sql, List<SqlParameter> Paras)
         {
             try
             {
                 using (SqlConnection con = CONN_Builder())
+                {
+                    con.Open();
+                    using (SqlCommand cmd = new(sql, con))
+                    {
+                        cmd.Parameters.AddRange(Paras.ToArray());
+                        cmd.ExecuteNonQuery();
+                    }
+                    con.Close();
+                }
+
+                return CDictionary.OK;
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
+        public string MAIL_SqlNonQuery(string sql, List<SqlParameter> Paras)
+        {
+            try
+            {
+                using (SqlConnection con = MAIL_CONN_Builder())
                 {
                     con.Open();
                     using (SqlCommand cmd = new(sql, con))
@@ -115,6 +143,35 @@ namespace CellReport_Workflow.Models.Sql
             catch (Exception ex)
             {
                 return CDictionary.ERR;
+                //return ex.ToString();
+            }
+        }
+        public List<string> ListStringReader(string sql, string ColumnName, List<SqlParameter> Paras)
+        {
+            List<string> datas = new();
+            try
+            {
+                using (SqlConnection con = CONN_Builder())
+                {
+                    con.Open();
+                    using (SqlCommand cmd = new(sql, con))
+                    {
+                        if (Paras != null && Paras.Count > 0)
+                            cmd.Parameters.AddRange(Paras.ToArray());
+                        SqlDataReader dr = cmd.ExecuteReader();
+                        while (dr.Read())
+                        {
+                            string z = !dr.IsDBNull(dr.GetOrdinal(ColumnName)) ? dr[ColumnName].ToString() : "";
+                            datas.Add(z);
+                        }
+                    }
+                    con.Close();
+                }
+                return datas;
+            }
+            catch (Exception ex)
+            {
+                return datas;
                 //return ex.ToString();
             }
         }
@@ -191,7 +248,18 @@ namespace CellReport_Workflow.Models.Sql
         }
         //List<Product> product  = SqlBase.DynamicDataBuidler<Product>(sql, null);
 
+        public string GetCV_PT_ForPBSC(string PBSC_FULL_ID)
+        {
+            string sql = "SELECT T.CV_PT ";
+            sql += " FROM AP_PBSC_T P ";
+            sql += " INNER JOIN CUSTOMER C ON P.SEQ_NUM = C.SEQ_NUM ";
+            sql += " INNER JOIN  AP_ProjectType_T T ON C.ProjectType = T.SID ";
+            sql += " WHERE P.PBSC_FULL_ID = @K_PBSC_FULL_ID ";
+            List<SqlParameter> Paras = new() { new("K_PBSC_FULL_ID", PBSC_FULL_ID) };
 
+            return StringReader(sql, "CV_PT", Paras);
+
+        }
 
     }
 }

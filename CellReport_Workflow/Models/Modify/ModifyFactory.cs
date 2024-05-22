@@ -14,9 +14,12 @@ namespace CellReport_Workflow.Models.Modify
             List<SqlParameter> Paras = new();
             List<Modify> datas = new();
 
-            string sql = "SELECT M.[Id], M.[cus_ct_id], M.[Apply_Date], M.[Apply_By], M.[Reson], M.[reply_Date], M.[reply_By], M.[reply], M.[reply_remark] FROM cr_Modify M";
+            string sql = "SELECT M.[Id], M.[cus_ct_id], M.[Apply_Date], M.[Apply_By], M.[Reson], M.[reply_Date], M.[reply_By], M.[reply], M.[reply_remark], E.ENG_NAME AS Apply_By_E, E1.ENG_NAME AS reply_By_E ";
 
+            sql += "FROM cr_Modify M ";
             sql += " Left JOIN cr_main CM ON M.cus_ct_id = CM.cus_ct_id ";
+            sql += " Left JOIN EMPLOYEE E ON M.Apply_By = E.EMP_ID ";
+            sql += " Left JOIN EMPLOYEE E1 ON M.reply_By = E1.EMP_ID ";
             sql += "WHERE 1=1 ";
 
 
@@ -58,10 +61,12 @@ namespace CellReport_Workflow.Models.Modify
             List<SqlParameter> Paras = new();
             List<Modify> datas = new();
 
-            string sql = "SELECT M.[Id], M.[cus_ct_id], M.[Apply_Date], M.[Apply_By], M.[Reson], M.[reply_Date], M.[reply_By], M.[reply], M.[reply_remark] FROM cr_Modify M";
-
+            string sql = "SELECT M.[Id], M.[cus_ct_id], M.[Apply_Date], M.Apply_By, M.[Reson], M.[reply_Date], M.reply_By, M.[reply], M.[reply_remark], E.ENG_NAME AS Apply_By_E, E1.ENG_NAME AS reply_By_E";
+            sql += " FROM cr_Modify M ";
             sql += " Left JOIN cr_main CM ON M.cus_ct_id = CM.cus_ct_id ";
-            sql += "WHERE 1=1 ";
+            sql += " Left JOIN EMPLOYEE E ON M.Apply_By = E.EMP_ID ";
+            sql += " Left JOIN EMPLOYEE E1 ON M.reply_By = E1.EMP_ID ";
+            sql += " WHERE 1=1 ";
 
             if (Lab == CDictionary.C_LAB && string.IsNullOrEmpty(ProductType))
             {
@@ -180,6 +185,8 @@ namespace CellReport_Workflow.Models.Modify
                             x.reply_Date = !dr.IsDBNull(dr.GetOrdinal("reply_Date")) ? DateTimeConverter(dr["reply_Date"].ToString()) : "";//
                             x.reply = !dr.IsDBNull(dr.GetOrdinal("reply")) ? dr["reply"].ToString() : "";
                             x.reply_remark = !dr.IsDBNull(dr.GetOrdinal("reply_remark")) ? dr["reply_remark"].ToString() : "";
+                            x.Apply_By_E = !dr.IsDBNull(dr.GetOrdinal("Apply_By_E")) ? dr["Apply_By_E"].ToString() : "";
+                            x.reply_By_E = !dr.IsDBNull(dr.GetOrdinal("reply_By_E")) ? dr["reply_By_E"].ToString() : "";
                             datas.Add(x);
                         }
                         dr.Close();

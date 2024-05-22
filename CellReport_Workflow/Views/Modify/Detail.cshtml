@@ -67,7 +67,8 @@
                                             <tbody>
                                                 <tr>
                                                     <td>申請人</td>
-                                                    <td>{{apply_By}}</td>
+                                                    <td>{{apply_By_E}}</td>
+                                                    <td style="display:none">{{apply_By}}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>申請時間</td>
@@ -90,7 +91,8 @@
                                             <tbody>
                                                 <tr>
                                                     <td>實驗室主管</td>
-                                                    <td>{{reply_By}}</td>
+                                                    <td>{{reply_By_E}}</td>
+                                                    <td style="display:none">{{reply_By}}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>回覆時間</td>
@@ -142,12 +144,7 @@
                                         @*<iframe src="~/file/ffdp112_e_ffdp11203212.pdf" style="height:1200px; width:100%"></iframe>*@
                                         <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample" style="">
                                             <div class="card-body">
-                                                <iframe src="~/file/@{
-                                                                                                                    @ViewBag.Id
-}.PDF" style="height:1200px; width:100%"></iframe>
-                                                <iframe src="~/file/@{
-                                                                                                                    @ViewBag.Id
-}_HLACheck_C.pdf" style="height:1200px; width:100%" class="HLA"></iframe>
+                                               
                                             </div>
                                         </div>
                                         <div id="collapseTwo" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample" style="">
@@ -245,9 +242,11 @@
                 id: "",
                 apply_Date: "",
                 apply_By: "",
+                apply_By_E: "",
                 reson: "",
                 reply_Date: "",
                 reply_By: "",
+                reply_By_E: "",
                 reply: "",
                 reply_remark: "",
                 reply_remark_keyIn: ""
@@ -287,9 +286,11 @@
                         report_Info.id = data.id;
                         report_Info.apply_Date = data.apply_Date;
                         report_Info.apply_By = data.apply_By;
+                        report_Info.apply_By_E= data.apply_By_E;
                         report_Info.reson = data.reson;
-
                         report_Info.reply_By = data.reply_By;
+                        report_Info.reply_By_E = data.reply_By_E;
+
                         if (data.reply_Date == "") {
                             report_Info.reply_Date = "--"
                         }
@@ -311,7 +312,7 @@
                             report_Info.reply_remark = data.reply_remark;
                         }
 
-                        if (data.reply == "" && (DEPARTMENT == "細胞實驗室" || DEPARTMENT == "造血實驗室") && RANK == "部門主管"){
+                        if (data.reply == "" && (DEPARTMENT == "細胞實驗室" || DEPARTMENT == "造血實驗室") && (RANK == "品質主管" || RANK == "實驗室主管")) {
                             $("#Answer").css("display","");
                         }
                     });
@@ -329,8 +330,11 @@
                         dataType: "json",
                         data: {
                             Id: report_Info.id ,
+                            Cus_CT_ID:report_Info.Cus_CT_ID,
                             reply: "同意",
-                            reply_remark: report_Info.reply_remark_keyIn
+                            reply_remark: report_Info.reply_remark_keyIn,
+                            apply_By: report_Info.apply_By,
+                            reson: report_Info.reson
                         }
                     })
                         .done(data => {
@@ -354,8 +358,11 @@
                         dataType: "json",
                         data: { 
                             Id: report_Info.id ,
+                            Cus_CT_ID: report_Info.Cus_CT_ID,
                             reply: "不同意",
-                            reply_remark: report_Info.reply_remark_keyIn
+                            reply_remark: report_Info.reply_remark_keyIn,
+                            apply_By: report_Info.apply_By,
+                            reson: report_Info.reson
                         }
                     })
                         .done(data => {

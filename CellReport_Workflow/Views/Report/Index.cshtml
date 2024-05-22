@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home Page1";
     Layout = "_Layout1";
 }
 
@@ -127,14 +127,25 @@
                         <vue-button class="mr-2" icon="fa-search" color="info" v-on:click="Search">
                             查詢
                         </vue-button>
-                        <vue-button class="mr-2" icon="fa-redo" color="info" v-on:click="GetSurveyTableDraw">
+                        <vue-button class="mr-2 " icon="fa-redo" color="info" v-on:click="GetSurveyTableList">
                             重新整理
                         </vue-button>
                         <vue-button class="mr-2" icon="fa-file-pdf" color="info" v-on:click="GetAllPDF" id="download">
                             批次觀看
                         </vue-button>
-                        <vue-button icon="fa-upload" color="info" v-on:click="UploadReport" id="upload">
+                        <vue-button class="mr-2" icon="fa-file-edit" color="info" v-on:click="GetAllSign" id="sign">
+                            批次簽核
+                        </vue-button>
+                        <vue-button class="mr-2" icon="fa-upload" color="info" v-on:click="UploadReport" id="upload">
                             批次上傳
+                        </vue-button>
+                        <vue-button class="mr-2" icon=".fa-comment" color="info" style="display:none" v-on:click="SendNext" id="btnNext">
+                            通知下階段簽核
+                            <span class="badge bg-danger-800 ml-2" id="sendNum">{{sendNum}}</span>
+                        </vue-button>
+                        <vue-button icon=".fa-comment" color="info" style="display:none" v-on:click="SendUpload" id="btnSendUpload">
+                            發送上傳通知
+                            <span class="badge bg-danger-800 ml-2" id="uploadNum">{{uploadNum}}</span>
                         </vue-button>
                     </h2>
                 </div>
@@ -145,14 +156,17 @@
                                 <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.Id" @* v-on:keyup="GetSurveyTableList"*@>
                                     客戶代號
                                 </vue-input>
-                                <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.ProductType" @*v-on:keyup="GetSurveyTableList"*@>
+                                @* <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.ProductType" >
+                                產品別
+                                </vue-input>*@
+                                <vue-select class="col-lg-3 col-md-3 mb-1" v-model="Filter.ProductType" @*v-on:change="GetSurveyTableList"*@
+                                            v-bind:options="ProductTypeOptions">
                                     產品別
-                                </vue-input>
+                                </vue-select>
                                 <vue-select class="col-lg-3 col-md-3 mb-1" v-model="Filter.Status" @*v-on:change="GetSurveyTableList"*@
                                             v-bind:options="StatusOptions">
                                     簽核狀態
                                 </vue-select>
-
                             </div>
                             <div class="form-row" style="font-size: 14px;">
                                 <vue-input class="col-lg-3 col-md-3 mb-1" v-model.trim="Filter.Finish_s" @* v-on:keyup="GetSurveyTableList"*@ type="date">
@@ -163,26 +177,14 @@
                                     完成日(訖)
                                 </vue-input>
 
+                                @*   <vue-select class="col-lg-3 col-md-3 mb-1" v-model.trim="select" v-on:change="SelectALL" v-bind:options="StatusOptions">
+                                批次勾選
+                                </vue-select>*@
                             </div>
                         </div>
-
                     </div>
 
                     <table id="surveyTable" class="table table-bordered table-hover table-striped w-100">
-                        <thead>
-                            <tr>
-                                <th>內容</th>
-                                @*<th>ID</th>*@
-                                <th>客戶代號</th>
-                                <th>姓名</th>
-                                <th>完成日</th>
-                                <th>產品別</th>
-                                @* <th>出報告日</th>*@
-                                <th>簽核狀態</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
                     </table>
                 </div>
             </div>
@@ -220,13 +222,23 @@
                         { "text": "簽核完成", "value": "簽核完成" },
                         { "text": "報告上傳", "value": "報告上傳" }
                     ],
+                    ProductTypeOptions: [
+                        { "text": "請選擇", "value": "" },
+                        { "text": "ADSC", "value": "ADSC" },
+                        { "text": "CB", "value": "CB" },
+                        { "text": "MSC", "value": "MSC" },
+                        { "text": "PBSC", "value": "PBSC" },
+                        { "text": "TSC", "value": "TSC" }
+                    ],
                     Filter: {
                         Id: "",
                         ProductType: "",
                         Status: "",
                         Finish_s: "",
                         Finish_e: "",
-                    }
+                    },
+                    sendNum: "",
+                    uploadNum: "",
                 },
                 components: {
                     loading: VueLoading
@@ -243,22 +255,40 @@
                     //    .done(data => {
                     //        console.log(data);
                     //    });
-                    if(RANK != "部門主管"){
-                       $("#download, #upload").css("display","none");
+                    if (RANK != SYSRANK.LAB) {
+                        $("#upload").css("display", "none");
                     }
-
+                    if (RANK == SYSRANK.QC || RANK == SYSRANK.LAB) {
+                        $("#sign").css("display", "");
+                    }
+                    else {
+                        $("#sign").css("display", "none");
+                    }
                     this.InitSurveyTable();
+
                 },
                 methods: {
-                    Search() {
+                    Search() { //==================搜尋
                         //surveyContent.ResetData();
-                        console.log(this.Filter);
+                        //console.log(this.Filter);
                         $("#surveyTable").DataTable().destroy();
                         $('#surveyTable').empty();
                         this.InitSurveyTable();
+
+
                         //this.IsShow = false;
                     },
-                    OpenResultUrl(e) {
+                    OpenResultUrl(e) { //==================轉Detial
+                        var cusId = surveyList.SurveyTable.rows({ selected: true }).data();
+                        var str = "";
+                        for (let i = 0; i <= cusId.length - 1; i++) {
+                            str += cusId[i].cus_ct_id + "%";
+                        }
+                        if (str.endsWith("%")) {
+                            str = str.replace(/%+$/, '')
+                        }
+
+                        this.setCookie("cookie_DataSelect", str);
                         var id = $(e.currentTarget).siblings("input.hiddenDemoData").val();
                         window.location.assign('@Url.Content("~/Report/Detail")' + `?Id=${id}`);
                     },
@@ -268,49 +298,339 @@
                     GetSurveyTableDraw() {
                         this.SurveyTable.ajax.reload(null, false)
                     },
-                    GetAllPDF() {
-                        let output = this.GetCheck();
-                        console.log(output);
+                    GetAllPDF() {  //==================批次下載
+                        let output = this.GetCheck_ID();
                         $.ajax({
                             url: `@Url.Content("~/Report/GetAllPDF")`,
                             type: "post",
-                            dataType: "json",
+                            //dataType: "json",
                             data: {
                                 datas: output
                             },
-                        })
-                            .done(data => {
-                                console.log(data);
-                            });
-                    },
-                    UploadReport() {
-                        let output = this.GetCheck();
-                        console.log(output);
-                        $.ajax({
-                            url: `@Url.Content("~/Report/UploadReport")`,
-                            type: "post",
-                            dataType: "json",
-                            data: {
-                                datas: output
+                            success: function (data) {
+                                toastr.info("", "PDF合併完成，檔案下載中...", { timeOut: 2000 });
+                                window.location.href = `@Url.Content("~/Report/Download")/?TempPath=${data}`;
                             },
-                        })
-                            .done(data => {
-                                console.log(data);
-                            });
-                    },
-                    GetCheck() {
-                        let checkboxs = document.querySelectorAll("input[type='checkbox']:checked");
-                        let output = [];
-                        checkboxs.forEach((checkbox) => {
-                            output.push(checkbox.name);
+                            error: function (err) {
+                                toastr.error("", err.responseText, { timeOut: 0 });
+                            }
                         });
-                        //console.log(output);
+                    },
+                    UploadReport() { //==================批次上傳
+                        let output = this.GetCheck_ID();
+                        let output_Stage = this.GetCheck_stage();
+                        let str = "";
+
+                        if (RANK == SYSRANK.LAB) {
+                            for (let i = 0; i <= output_Stage.length - 1; i++) {
+                                if (output_Stage[i] != STATUS.SING_FINISH) {
+                                    //this.SurveyTable.rows(`:eq(${index})`, { page: 'All' }).deselect();
+                                    str += `${output[i]}, <br>`
+                                }
+                            }
+                            if (str.length > 0) {
+                                str += "無法上傳 <br>上傳動作已取消。";
+                                toastr.warning("", str, { timeOut: 0 });
+                                return;
+                            }
+                            else {
+                                $.ajax({
+                                    url: `@Url.Content("~/Report/UploadReport")`,
+                                    type: "post",
+                                    data: { datas: output },
+                                    success: function (data) {
+                                        var cookie_sendUploadNoty = surveyList.getCookie("cookie_sendUploadNoty");
+                                        if (cookie_sendUploadNoty == "" || cookie_sendUploadNoty == null) {
+                                            let datastr = ""
+                                            for (let i = 0; i <= output.length - 1; i++) {
+                                                datastr += output[i] + "%";
+                                            }
+                                            surveyList.setCookie("cookie_sendUploadNoty", datastr);
+                                        }
+                                        else {
+                                            for (let i = 0; i <= output.length - 1; i++) {
+                                                cookie_sendUploadNoty += data[i] + "%";
+                                            }
+                                            surveyList.setCookie("cookie_sendUploadNoty", cookie_sendUploadNoty);
+                                        }
+                                        toastr.info("", data, { timeOut: 2000 });
+                                        surveyList.GetSurveyTableList();
+                                        surveyList.SetUploadNum();
+                                    },
+                                    error: function (err) {
+                                        toastr.error("", err.responseText, { timeOut: 0 });
+                                        surveyList.GetSurveyTableList();
+                                    }
+                                });
+                            }
+                        }
+                        else {
+                            return;
+                        }
+                    },
+                    GetAllSign() {  //==================批次簽核
+                        //let output_all = this.GetAllRows();
+                        let output = this.GetCheck_ID();
+                        let output_Stage = this.GetCheck_stage();
+                        let str = "";
+
+                        if (RANK == SYSRANK.QC) {
+                            for (let i = 0; i <= output_Stage.length - 1; i++) {
+                                if (output_Stage[i] != STATUS.LAB_SEND) {
+                                    //this.SurveyTable.rows(index).deselect();
+                                    str += `${output[i]}, <br>`
+                                }
+                            }
+                            if (str.length > 0) {
+                                str += "無法簽核 <br>簽核動作已取消。";
+                                toastr.warning("", str, { timeOut: 0 });
+                                return;
+                            }
+                            else {
+                                this.QC_SIGN_All(output);
+                            }
+                        }
+                        else if (RANK == SYSRANK.LAB) {
+                            for (let i = 0; i <= output_Stage.length - 1; i++) {
+                                if (output_Stage[i] != STATUS.QC_SING) {
+                                    //this.SurveyTable.rows(`:eq(${index})`, { page: 'All' }).deselect();
+                                    str += `${output[i]}, <br>`
+                                }
+                            }
+                            if (str.length > 0) {
+                                str += "無法簽核 <br>簽核動作已取消。";
+                                toastr.warning("", str, { timeOut: 0 });
+                                return;
+                            }
+                            else {
+                                this.LAB_SIGN_All(output);
+                            }
+                        }
+                        else {
+                            return;
+                        }
+                    },
+                    QC_SIGN_All(data) { //==================批次簽核QC
+                        $.ajax({
+                            url: `@Url.Content("~/Report/SingQC_All")`,
+                            type: "post",
+                            data: { datas: data },
+                            success: function (result) {
+                                var cookie_sendNoty = surveyList.getCookie("cookie_sendNoty");
+                                if (cookie_sendNoty == "" || cookie_sendNoty == null) {
+                                    let datastr = ""
+                                    for (let i = 0; i <= data.length - 1; i++) {
+                                        datastr += data[i] + "%";
+                                    }
+                                    surveyList.setCookie("cookie_sendNoty", datastr);
+                                }
+                                else {
+                                    for (let i = 0; i <= data.length - 1; i++) {
+                                        cookie_sendNoty += data[i] + "%";
+                                    }
+                                    surveyList.setCookie("cookie_sendNoty", cookie_sendNoty);
+                                }
+                                toastr.info("", result, { timeOut: 2000 });
+                                surveyList.GetSurveyTableList();
+                                surveyList.SetSendNum();
+                            },
+                            error: function (err) {
+                                toastr.error("", err.responseText, { timeOut: 0 });
+                                surveyList.GetSurveyTableList();
+                            }
+                        });
+                    },
+                    LAB_SIGN_All(data) { //==================批次簽核LAB
+                        $.ajax({
+                            url: `@Url.Content("~/Report/SingLAB_All")`,
+                            type: "post",
+                            data: { datas: data },
+                            success: function (result) {
+                                toastr.info("", result, { timeOut: 2000 });
+                                surveyList.GetSurveyTableList();
+                            },
+                            error: function (err) {
+                                toastr.error("", err.responseText, { timeOut: 0 });
+                                surveyList.GetSurveyTableList();
+                            }
+                        });
+                    },
+                    GetAllRows() { //==================取得所有ID
+                        let output = [];
+                        this.SurveyTable.rows().data().map(obj => {
+                            output.push(obj.id)
+                        });
+                        if (output.length < 1) {
+                            return;
+                        }
                         return output;
                     },
+                    GetCheck_ID() { //==================取得所選ID
+                        //let checkboxs = document.querySelectorAll("input[type='checkbox']:checked");
+                        //let output = [];
+                        //checkboxs.forEach((checkbox) => {
+                        //    output.push(checkbox.name);
+                        //});
+                        //console.log(output);
+                        let output = [];
+                        this.SurveyTable.rows({ selected: true }).data().map(obj => {
+                            output.push(obj.id)
+                        })
+                        if (output.length < 1) {
+                            toastr.warning("", "未選取任何資料", { timeOut: 3000 });
+                            return;
+                        }
+                        return output;
+                    },
+                    GetCheck_stage() {  //==================取得所選狀態
+                        let output = [];
+                        this.SurveyTable.rows({ selected: true }).data().map(obj => {
+                            output.push(obj.stage)
+                        })
+                        if (output.length < 1) {
+                            toastr.warning("", "未選取任何資料", { timeOut: 3000 });
+                            return;
+                        }
+                        return output;
+                    },
+                    setCookie(name, value) {
+                        var Days = 1;
+                        var exp = new Date();
+                        exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+                        document.cookie = name + "=" + encodeURI(value) + ";expires=" + exp.toGMTString();
+                    },
+                    getCookie(name) {
+                        var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+                        if (arr = document.cookie.match(reg)) {
+                            return decodeURI(arr[2]);
+                        } else {
+                            return null;
+                        }
+                    },
+                    delCookie(name) {
+                        var exp = new Date();
+                        exp.setTime(exp.getTime() - 1);
+                        var cval = getCookie(name);
+                        if (cval != null) {
+                            document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+                        }
+                    },
+                    SeleIndexByID(cus_ct_id) {
+                        var id = this.SurveyTable
+                            .row(function (idx, data, node) {
+                                if (data.cus_ct_id === cus_ct_id)
+                                    return true;
+                                else
+                                    return false;
+                            }).index();
+                        console.log(`index = ${id}`);
+                        if (id != null) {
+                            this.SurveyTable.row(id).select();
+                        }
+                        else {
+                            console.log(`Can't find ${cus_ct_id}`)
+                        }
+                    },
+
+
+                    SetUploadNum(){  //通知上傳(資料)
+                        var cookie_sendUploadNoty = this.getCookie("cookie_sendUploadNoty");
+                        if (cookie_sendUploadNoty == "" || cookie_sendUploadNoty == null) {
+                            this.uploadNum = "";
+                            $("#btnSendUpload").css("display", "none");
+                        }
+                        else {
+                            if (cookie_sendUploadNoty.endsWith("%")) {
+                                cookie_sendUploadNoty = cookie_sendUploadNoty.replace(/%+$/, '');
+                            }
+                            var datas = cookie_sendUploadNoty.split('%');
+                            console.log("cookie_sendUploadNoty: " + datas.length);
+                            $("#btnSendUpload").css("display", "");
+                            this.uploadNum = datas.length;
+                        }
+                    },
+                    SetSendNum() {  //通知簽核(資料)
+                        var cookie_sendNoty = this.getCookie("cookie_sendNoty");
+                        if (cookie_sendNoty == "" || cookie_sendNoty == null) {
+                            this.sendNum = ""
+                            $("#btnNext").css("display","none");
+                        }
+                        else {
+                            if (cookie_sendNoty.endsWith("%")) {
+                                cookie_sendNoty = cookie_sendNoty.replace(/%+$/, '');
+                            }
+                            var datas = cookie_sendNoty.split('%');
+                            console.log("cookie_sendNoty: " + datas.length);
+                            $("#btnNext").css("display", "");
+                            this.sendNum = datas.length;
+                        }
+                    },
+
+
+
+                    SendNext(){
+                        var cookie_sendNoty = this.getCookie("cookie_sendNoty");
+                        if (cookie_sendNoty.endsWith("%")) 
+                            cookie_sendNoty = cookie_sendNoty.replace(/%+$/, '');
+                        var datas = cookie_sendNoty.split('%');
+                        $.ajax({
+                            url: `@Url.Content("~/Report/SendNext")`,
+                            type: "post",
+                            data: { datas_ID: datas },
+                            success: function (result) {
+                                toastr.info("", result, { timeOut: 2000 });
+                                surveyList.delCookie("cookie_sendNoty");
+                                surveyList.SetSendNum();
+                                //surveyList.GetSurveyTableList();
+                            },
+                            error: function (err) {
+                                toastr.error("", err.responseText, { timeOut: 0 });
+                                surveyList.GetSurveyTableList();
+                            }
+                        });
+
+                    },
+                    SendUpload(){
+                        var cookie_sendUploadNoty = this.getCookie("cookie_sendUploadNoty");
+                        if (cookie_sendUploadNoty.endsWith("%"))
+                            cookie_sendUploadNoty = cookie_sendUploadNoty.replace(/%+$/, '');
+                        var datas = cookie_sendUploadNoty.split('%');
+                        $.ajax({
+                            url: `@Url.Content("~/Report/SendUpload")`,
+                            type: "post",
+                            data: { datas_ID: datas },
+                            success: function (result) {
+                                toastr.info("", result, { timeOut: 2000 });
+                                surveyList.delCookie("cookie_sendUploadNoty");
+                                surveyList.SetUploadNum();
+                                //surveyList.GetSurveyTableList();
+                            },
+                            error: function (err) {
+                                toastr.error("", err.responseText, { timeOut: 0 });
+                                surveyList.GetSurveyTableList();
+                            }
+                        });
+                    },
+
+
+
+
+
+
+
+
+
                     GetSurveyTableList() {
-                        this.SurveyTable.ajax.reload();
+                        //var index = surveyList.SurveyTable.rows({ selected: true }).indexes();
+                        var cusid = surveyList.SurveyTable.rows({ selected: true }).data();
+                        this.SurveyTable.ajax.reload(function () {
+                            for (let i = 0; i < cusid.length; i++) {
+                                surveyList.SeleIndexByID(cusid[i].cus_ct_id);
+                            }
+                        }, false);
                     },
                     InitSurveyTable() {
+                        $('#surveyTable').append(`<thead><tr><th><input type="checkbox" class="select_all" id="Select_All" style="margin-left:40%"></th><th>內容</th><th>客戶代號</th><th>姓名</th><th>完成日</th> <th>產品別</th><th>簽核狀態</th><th>執行人員</th></tr></thead>`);
                         var _this = this;
                         _this.SurveyTable = $("#surveyTable").DataTable({
 
@@ -324,65 +644,92 @@
                             deferRender: true,
                             //processing: true,
                             ordering: true,
-                            order: [[1, 'asc']],
-                            columnDefs: [
-                            ],
+                            stateSave: true,
+                            order: [[3, 'asc']],
+                            columnDefs: [],
                             lengthMenu: [10],
                             language: {
                                 url: `@Url.Content("~/lang/dataTables/tw.json")`
                             },
+                            select: { style: 'multi' },
+                            initComplete: function (settings, json) {
+                                var cookie_data = _this.getCookie("cookie_DataSelect");
+                                if (cookie_data != null) {
+                                    if (cookie_data != "") {
+                                        var datas = cookie_data.split('%');
+                                        for (let i = 0; i <= datas.length; i++) {
+                                            _this.SeleIndexByID(datas[i]);
+                                        }
+                                    }
+                                    _this.delCookie("cookie_DataSelect");
+                                }
+                            },
                             columns: [
-                                {
-                                    data: "id",
-                                    render: function (data, type, row) {
-                                        var reply = '<i class="fa fa-list rowIcon" title="內容"></i>'
-                                        //var link = '<i class="fa fa-link rowIcon" title="開啟連結"></i><br/>'
-                                        return reply //+ link
-                                    },
-                                    sortable: false
-                                },
                                 //{
+                                //    //title: "內容",
                                 //    data: "id",
+                                //    render: function (data, type, full, meta) {
+                                //        return meta.row;
+                                //    },
                                 //    sortable: false
+
                                 //},
                                 {
+                                    //title: "內容",
+                                    data: "id",
+                                    render: function (data, type, row) {
+                                        var reply = `` //+ `<input type="checkbox" style="margin-left:20%; width:40px" name="` + row['stage'] + `" value="'` + data + '">';
+                                        return reply //+ link
+                                    },
+                                    sortable: false,
+                                    className: 'select-checkbox'
+
+                                },
+                                {
+                                    //title: "內容",
+                                    data: "id",
+                                    render: function (data, type, row) {
+                                        var reply = `<i class="fa fa-list rowIcon" title="內容"></i>` //+ `<input type="checkbox" style="margin-left:20%; width:40px" name="` + row['stage'] + `" value="'` + data + '">';
+                                        return reply //+ link
+                                    },
+                                    sortable: false,
+                                    //className: 'select-checkbox'
+                                },
+                                {
+                                    //title: "客戶代號",
                                     data: "cus_ct_id",
                                     render: function (data) {
                                         return data;
-                                    }
+                                    },
+                                    className: 'ID_Data'
                                 },
                                 {
+                                    // title: "姓名",
                                     data: "motheR_NAME",
                                 },
                                 //{
                                 //    data: "reportDate",
                                 //},
                                 {
+                                    //title: "完成日",
                                     data: "final_Date",
-                                    //render: function (data) {
-                                    //    if (data != "") {
-                                    //        return moment.utc(data).local().format('YYYY/MM/DD HH:mm:ss');
-                                    //    }
-                                    //    return "";
-                                    //}
                                 },
                                 {
+                                    // title: "產品別",
                                     data: "productType",
-                                    //render: function (data) {
-                                    //    if (data != "") {
-                                    //        return moment.utc(data).local().format('YYYY/MM/DD HH:mm:ss');
-                                    //    }
-                                    //    return "";
-                                    //}
                                 },
                                 {
+                                    //title: "簽核狀態",
                                     data: "stage",
-                                    //render: function (data, type, row) {
-                                    //    if (data == 0) {
-                                    //        return "關閉"
-                                    //    }
-                                    //    return "公開"
-                                    //},
+                                    render: function (data, type, row) {
+                                        return `${data}`
+                                    },
+                                    sortable: true
+                                },
+                                {
+                                    //title: "簽核狀態",
+                                    data: "whoSign",
+                                   
                                     sortable: true
                                 },
                             ],
@@ -393,11 +740,6 @@
                                 async: true,
                                 cache: false,
                                 type: "POST",
-                                //data: function data(d) {
-                                //    console.log(this.Filter)
-                                //    d.Filter = JSON.stringify(_this.Filter);
-                                //    console.log(d.Filter)
-                                //},
                                 data: {
                                     Id: _this.Filter.Id,
                                     ProductType: _this.Filter.ProductType,
@@ -405,930 +747,72 @@
                                     Finish_s: _this.Filter.Finish_s,
                                     Finish_e: _this.Filter.Finish_e
                                 },
-                                beforeSend() {
-                                    //_this.ContantUsApps = [];
-                                }
+                                beforeSend() { }
                             },
-
-
                             createdRow(row, data, index) {
                                 var hidden = $('<input/>', {
                                     type: 'hidden',
                                     value: data.cus_ct_id,
                                     class: 'hiddenDemoData'
                                 });
-                                $('td', row).eq(0).append(hidden);
+                                $('td', row).eq(1).append(hidden);
+                                $(row).attr('id', data.cus_ct_id);
+                                //var hidden_stu = $('<input/>', {
+                                //    type: 'hidden',
+                                //    value: data.stage,
+                                //    class: 'hiddenDemoData_stu'
+                                //});
+                                //$('td', row).eq(0).append(hidden_stu);
+                                //console.log(_this.Filter.Status)
+                                //var CheckBox = $('<input/>', {
+                                //    type: 'checkbox',
+                                //    class: 'ustom-control-input check checkchang',
+                                //    style: 'margin-left:20%; width:40px',
+                                //    name: data.cus_ct_id,
+                                //});
+                                //$('td', row).eq(0).append(CheckBox);
 
-                                if (data.stage == "簽核完成") {
-                                    if (DEPARTMENT == "細胞實驗室" && RANK == "部門主管") {
-                                        if(data.productType == "ADSC" ||data.productType == "MSC" ||data.productType == "TSC"){
-                                            console.log(data.productType);
-                                           var CheckBox = $('<input/>', {
-                                               type: 'checkbox',
-                                               class: 'ustom-control-input check',
-                                               style: 'margin-left:20%; width:40px',
-                                               name: data.cus_ct_id
-                                           });
-                                           $('td', row).eq(0).append(CheckBox);
-                                        }
-                                    }
-                                    else if (DEPARTMENT == "造血實驗室" && RANK == "部門主管") {
-                                         if(data.productType == "CB" ||data.productType == "PBSC"){
-                                            var CheckBox = $('<input/>', {
-                                                type: 'checkbox',
-                                                class: 'ustom-control-input check',
-                                                style: 'margin-left:20%; width:40px',
-                                                name: data.cus_ct_id
-                                            });
-                                            $('td', row).eq(0).append(CheckBox);                                         
-                                         }
-                                    }
-                                }
+                                //if (data.stage == STATUS.SING_FINISH) {
+                                //    if (DEPARTMENT == "細胞實驗室" && RANK == "部門主管") {
+                                //        if(data.productType == "ADSC" ||data.productType == "MSC" ||data.productType == "TSC"){
+                                //            console.log(data.productType);
+                                //           var CheckBox = $('<input/>', {
+                                //               type: 'checkbox',
+                                //               class: 'ustom-control-input check',
+                                //               style: 'margin-left:20%; width:40px',
+                                //               name: data.cus_ct_id
+                                //           });
+                                //           $('td', row).eq(0).append(CheckBox);
+                                //        }
+                                //    }
+                                //    else if (DEPARTMENT == "造血實驗室" && RANK == "部門主管") {
+                                //         if(data.productType == "CB" ||data.productType == "PBSC"){
+                                //            var CheckBox = $('<input/>', {
+                                //                type: 'checkbox',
+                                //                class: 'ustom-control-input check',
+                                //                style: 'margin-left:20%; width:40px',
+                                //                name: data.cus_ct_id
+                                //            });
+                                //            $('td', row).eq(0).append(CheckBox);
+                                //         }
+                                //    }
+                                //}
                             }
                         });
-                        //$('#surveyTable tbody').on('click', '.fa-edit', this.Edit);
-                        //$('#surveyTable tbody').on('click', '.fa-link', this.Openlink);
-                        $('#surveyTable tbody').on('click', '.fa-list', this.OpenResultUrl);
-                    },
 
+                        $('#surveyTable tbody').on('click', '.fa-list', this.OpenResultUrl);
+                        $("#Select_All").on('click', function () {
+                            if ($('#Select_All').is(":checked"))
+                                _this.SurveyTable.rows().select();
+                            else
+                                _this.SurveyTable.rows().deselect();
+                        });
+
+                        _this.SetUploadNum();
+                        _this.SetSendNum();
+                    },
                 }
             });
-
-            //var SurveyDataObj = {
-            //    "Id": "",
-            //    "Title": "",
-            //    "PrefaceMessage": "",
-            //    "Status": 0,
-            //    "ValidTimeActive": 0,
-            //    "ValidStartTime": "",
-            //    "ValidEndTime": "",
-            //    "CRM_CustomerIdActive": 0 == 1,
-            //    "CRM_ContractIdActive": 0 == 1,
-            //    "ThankPageButtonActive": 0 == 1,
-            //    "ThankPageButtonText": "",
-            //    "ThankPageButtonUrl": "",
-            //    "Emails": [],
-            //    "LinkQuestions": []
-            //};
-
-            //var surveyContent = new Vue({
-            //    el: "#surveyContent",
-            //    data: {
-            //        InputEmail: "",
-            //        UploadSetting: {
-            //            Id: "",
-            //            FileSize: 5,
-            //            FileFormatRestrictions: true,
-            //            Word: true,
-            //            Image: true,
-            //            PPT: true,
-            //            Video: true,
-            //            Excel: true,
-            //            Audio: true
-            //        },
-            //        IsLoading: false,
-            //        IsShow: false,
-            //        Page: 1,
-            //        QEditor: {
-            //            Preface: {},
-            //            Epilogue: {},
-            //            Thanks: {}
-            //        },
-            //        SurveyData: JSON.parse(JSON.stringify(SurveyDataObj)),
-
-            //        FileSizeOptions: [
-            //            { "text": "1 MB", "value": 1 },
-            //            { "text": "5 MB", "value": 5 },
-            //            { "text": "10 MB", "value": 10 }
-
-            //        ],
-
-            //        StatusOptions: [
-            //            { "text": "關閉", "value": 0 },
-            //            { "text": "公開", "value": 1 }
-
-            //        ],
-            //        ValidTimeActive: [
-            //            { "text": "關閉", "value": 0 },
-            //            { "text": "開啟", "value": 1 }
-
-            //        ], RightItems: [
-            //            { value: 1, text: '單行文字', IsActive: true },
-            //            { value: 2, text: '多行文字', IsActive: true },
-            //            { value: 3, text: '單選題', IsActive: true },
-            //            { value: 4, text: '多選題', IsActive: true },
-            //            { value: 5, text: '日期', IsActive: true },
-            //            { value: 9, text: '時分', IsActive: true },
-            //            { value: 6, text: '檔案上傳', IsActive: true },
-            //            { value: 7, text: '分隔線', IsActive: true },
-            //            { value: 8, text: '分類標題', IsActive: true },
-            //        ],
-            //        LeftItems: [],
-            //        highlightedIndex: -1,
-            //        SurveyDomain: window.location.origin + master.RootUrl + "q/Survey.aspx?Id=",
-            //        MainForm: {},
-            //        QuestionForm: {},
-            //        TempLinkId: {
-            //            Id: "",//題目Id
-            //            OptionId: ""// 選項Id
-            //        },
-            //        TempLinkQuestions: [],
-            //        LinkQuestions: [],
-
-            //    },
-            //    components: {
-            //        'loading': VueLoading,
-            //    },
-
-            //    watch: {
-            //        LeftItems() {
-            //            this.WatchNumber();
-            //        },
-            //    },
-            //    mounted() {
-            //        //this.QEditor.Preface = new Quill('#PrefaceEditor', {
-            //        //    modules: {
-            //        //        syntax: true,
-            //        //        toolbar: '#PrefaceToolbar'
-            //        //    },
-            //        //    placeholder: '',
-            //        //    theme: 'snow'
-            //        //});
-            //        //this.QEditor.Epilogue = new Quill('#EpilogueEditor', {
-            //        //    modules: {
-            //        //        syntax: true,
-            //        //        toolbar: '#EpilogueToolbar'
-            //        //    },
-            //        //    placeholder: '',
-            //        //    theme: 'snow'
-            //        //});
-            //        //this.QEditor.Thanks = new Quill('#ThanksEditor', {
-            //        //    modules: {
-            //        //        syntax: true,
-            //        //        toolbar: '#ThanksToolbar'
-            //        //    },
-            //        //    placeholder: '',
-            //        //    theme: 'snow'
-            //        //});
-            //        this.$nextTick(() => {
-            //            $(".icon-tooltip").each(function () {
-            //                $(this).tooltip();
-
-            //            });
-            //        })
-            //        this.InitFormValidator();
-            //    },
-
-            //    methods: {
-            //        OtherClick(item) {
-            //            item.Other.Need = !item.Other.Need; if (item.Other.Need) { item.Other.Title = '其他' };
-            //            var index = this.LinkQuestions.findIndex(e => e.Id == item.Id && e.OptionId == '-1');
-            //            if (index != -1) {
-            //                this.LinkQuestions.splice(index, 1)
-            //            }
-
-            //        },
-            //        NoneClick(item) {
-            //            item.None.Need = !item.None.Need; if (item.None.Need) { item.None.Title = '以上皆非' };
-            //            var index = this.LinkQuestions.findIndex(e => e.Id == item.Id && e.OptionId == '-2');
-            //            if (index != -1) {
-            //                this.LinkQuestions.splice(index, 1)
-            //            }
-            //        },
-            //        GetLinkQuestions(linkData) {
-            //            var _this = this;
-            //            var list = [];
-
-            //            linkData.LinkQuestions.forEach((Id) => {
-            //                var a = _this.LeftItems.find(e => e.Id == Id);
-            //                if (!!a) {
-            //                    list.push(a);
-            //                }
-
-
-            //            });
-            //            return list;
-
-            //        },
-            //        ConfirmLinkQuestions() {
-            //            var _this = this;
-            //            var data = {
-            //                Id: _this.TempLinkId.Id,
-            //                OptionId: _this.TempLinkId.OptionId,
-            //                Type: 0,//接題是0，跳題是1
-            //                LinkQuestions: [],
-            //            }
-            //            _this.TempLinkQuestions.forEach((item) => {
-            //                if (item.Checked) {
-            //                    data.LinkQuestions.push(item.Id)
-            //                }
-            //            });
-            //            var index = _this.LinkQuestions.findIndex((e) => e.Id == data.Id && e.OptionId == data.OptionId && e.Type == 0);
-            //            if (index > -1) {
-            //                _this.LinkQuestions.splice(index, 1)
-            //            }
-            //            if (data.LinkQuestions.length > 0) {
-            //                _this.LinkQuestions.push(data);
-            //            }
-            //            $("#LinkQuestionModal").modal("hide");
-
-
-            //        },
-            //        OpenLinkQuestion(Id, topicOption) {
-            //            var _this = this;
-            //            _this.TempLinkId.Id = Id;
-            //            _this.TempLinkId.OptionId = topicOption.Id;
-            //            var old = _this.LinkQuestions.find((e) => e.Id == Id && e.OptionId == _this.TempLinkId.OptionId && e.Type == 0);
-
-
-            //            _this.TempLinkQuestions = _this.LeftItems.map((item) => {
-            //                var data = {};
-            //                data.Checked = false;
-            //                if (!!old) {
-            //                    if (old.LinkQuestions.findIndex(e => e == item.Id) > -1) {
-            //                        data.Checked = true;
-            //                    }
-            //                }
-            //                data.IndentNeed = item.IndentNeed;
-            //                data.Number = item.Number;
-            //                data.Id = item.Id;
-            //                data.Title = item.Title;
-            //                return data;
-            //            });
-            //            $("#LinkQuestionModal").modal({
-            //                backdrop: "static"
-            //            });
-            //        },
-            //        Delete() {
-            //            var _this = this;
-            //            SmartMessageBox({
-            //                title: "注意",
-            //                message: "確定要 刪除 問卷嗎?",
-            //                callback(res) {
-            //                    if (res) {
-            //                        _this.ReturnAjax(
-            //                            "Api/Admin/DelSurvey.ashx",
-            //                            {
-            //                                "SurveyId": _this.SurveyData.Id,
-            //                            },
-            //                            function (result) {
-
-            //                                _this.IsShow = false;
-
-            //                            },
-            //                            "IsLoading"
-            //                        )
-            //                    }
-            //                }
-            //            })
-            //        },
-            //        DelEmail(index) {
-            //            var _this = this;
-            //            _this.SurveyData.Emails.splice(index, 1)
-
-            //        },
-            //        AddEmail() {
-            //            var _this = this;
-            //            var emailRule = /^\w+((-\w+)|(\.\w+))*\@@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
-            //            if (_this.InputEmail.search(emailRule) != -1) {
-            //                _this.SurveyData.Emails.push(_this.InputEmail);
-            //                _this.InputEmail = "";
-            //            } else {
-            //                openWarningDialog("不符合電子郵件格式", 10)
-            //            }
-
-            //        },
-            //        GetUploadSettingFile(UploadSetting) {
-            //            if (UploadSetting.FileFormatRestrictions) {
-            //                var str = "";
-            //                if (UploadSetting.Word) {
-            //                    str += "文件 ";
-            //                }
-            //                if (UploadSetting.Image) {
-            //                    str += "圖片 ";
-            //                }
-            //                if (UploadSetting.PPT) {
-            //                    str += "簡報 ";
-            //                }
-            //                if (UploadSetting.Video) {
-            //                    str += "影片 ";
-            //                }
-            //                if (UploadSetting.Excel) {
-            //                    str += "試算表 ";
-            //                }
-            //                if (UploadSetting.Audio) {
-            //                    str += "音檔 ";
-            //                }
-            //                return str;
-
-
-            //            } else {
-            //                return "無"
-            //            }
-            //        },
-            //        FileFormatRestrictions(checked) {
-            //            var _this = this;
-            //            if (!checked) {
-
-            //                _this.UploadSetting.Word = false;
-            //                _this.UploadSetting.Image = false;
-            //                _this.UploadSetting.PPT = false;
-            //                _this.UploadSetting.Video = false;
-            //                _this.UploadSetting.Excel = false;
-            //                _this.UploadSetting.Audio = false;
-
-            //            }
-
-
-            //        },
-            //        ConfirmUploadSetting() {
-            //            var _this = this;
-            //            if (_this.UploadSetting.FileFormatRestrictions) {
-            //                if (!(this.UploadSetting.Word
-            //                    || _this.UploadSetting.Image
-            //                    || _this.UploadSetting.PPT
-            //                    || _this.UploadSetting.Video
-            //                    || _this.UploadSetting.Excel
-            //                    || _this.UploadSetting.Audio)) {
-            //                    openWarningDialog("至少選擇一個檔案格式", 10)
-            //                    return;
-            //                }
-            //            }
-
-
-
-            //            var item = _this.LeftItems.find(e => e.Id == _this.UploadSetting.Id);
-            //            if (!!item) {
-            //                item.UploadSetting = {
-            //                    FileSize: _this.UploadSetting.FileSize,
-            //                    FileFormatRestrictions: _this.UploadSetting.FileFormatRestrictions,
-            //                    Word: _this.UploadSetting.Word,
-            //                    Image: _this.UploadSetting.Image,
-            //                    PPT: _this.UploadSetting.PPT,
-            //                    Video: _this.UploadSetting.Video,
-            //                    Excel: _this.UploadSetting.Excel,
-            //                    Audio: _this.UploadSetting.Audio
-            //                }
-            //            }
-            //            $("#UploadSettingModal").modal("hide");
-
-            //        },
-            //        OpenUploadSettingModal(item) {
-
-
-            //            this.UploadSetting = JSON.parse(JSON.stringify(item.UploadSetting));
-            //            this.UploadSetting.Id = item.Id
-            //            $("#UploadSettingModal").modal({
-            //                backdrop: "static"
-            //            });
-
-            //        },
-            //        InitFormValidator() {
-            //            var _this = this;
-
-            //            _this.MainForm = $("#MainForm").validate({
-            //                rules: {
-            //                    "surveyTitle": {
-            //                        required: true,
-            //                    },
-            //                    "ValidStartTime": {
-            //                        required: {
-            //                            depends() {
-            //                                return _this.SurveyData.ValidTimeActive;
-            //                            }
-            //                        }
-            //                    },
-            //                    "ValidEndTime": {
-            //                        required: {
-            //                            depends() {
-            //                                return _this.SurveyData.ValidTimeActive;
-            //                            }
-            //                        }
-            //                    },
-            //                    "ThankPageButtonText": {
-            //                        required: {
-            //                            depends() {
-            //                                return _this.SurveyData.ThankPageButtonActive;
-            //                            }
-            //                        }
-            //                    },
-            //                    "ThankPageButtonUrl": {
-            //                        required: {
-            //                            depends() {
-            //                                return _this.SurveyData.ThankPageButtonActive;
-            //                            }
-            //                        }
-            //                    }
-
-
-            //                },
-            //                highlight: function (element) {
-            //                    $(element).parent('.input-group').removeClass('has-success').addClass('has-error');
-            //                },
-            //                unhighlight: function (element) {
-            //                    $(element).parent('.input-group').removeClass('has-error');
-            //                },
-            //                errorElement: 'span',
-            //                errorClass: 'help-block',
-            //                errorPlacement: function (error, element) {
-            //                    if (element.parent('.input-group').length) {
-            //                        error.insertAfter(element.parent());
-            //                    }
-            //                    else {
-            //                        error.insertAfter(element);
-            //                    }
-            //                }
-
-            //            })
-
-            //            _this.QuestionForm = $("#QuestionForm").validate({
-
-            //                highlight: function (element) {
-            //                    $(element).parent().removeClass('has-success').addClass('has-error');
-            //                },
-            //                unhighlight: function (element) {
-            //                    $(element).parent().removeClass('has-error');
-            //                },
-            //                errorElement: 'div',
-            //                errorClass: 'help-block mb-1',
-            //                errorPlacement: function (error, element) {
-            //                    if (element.hasClass("optionTitle")) {
-            //                        error.css("margin-left", "35px");
-            //                        error.insertAfter(element.parent());
-            //                    } else if (element.hasClass("Title")) {
-            //                        error.insertAfter(element.parent());
-            //                    }
-
-            //                }
-
-            //            })
-
-
-            //            $.validator.addClassRules('Title', {
-            //                required: true,
-            //            });
-            //            $.validator.addClassRules('optionTitle', {
-            //                required: true,
-            //            });
-
-
-            //        },
-            //        async CopyUrl(url) {
-            //            try {
-            //                await navigator.clipboard.writeText(url);
-            //                openSuccessDialog("已複製", 3);
-            //            } catch (err) {
-            //                openWarningDialog("複製失敗", 10);
-            //            }
-
-            //        },
-            //        ResetData() {
-            //            var _this = this;
-            //            _this.Page = 1;
-            //            _this.SurveyData = JSON.parse(JSON.stringify(SurveyDataObj));
-            //            _this.LeftItems = [];
-            //            _this.highlightedIndex = -1;
-            //            _this.QEditor.Preface.root.innerHTML = "";
-            //            _this.QEditor.Epilogue.root.innerHTML = "";
-            //            _this.QEditor.Thanks.root.innerHTML = "";
-            //        },
-            //        GetSurvey(Id) {
-            //            var _this = this;
-            //            this.ResetData();
-            //            _this.ReturnAjax(
-            //                "Api/Admin/GetSurvey.ashx",
-            //                {
-            //                    "SurveyId": Id,
-            //                },
-            //                function (result) {
-
-            //                    var data = result.Data;
-
-            //                    _this.SurveyData = {
-            //                        "Id": data.Id,
-            //                        "Title": data.Title,
-            //                        "PrefaceMessage": data.PrefaceMessage,
-            //                        "EpilogueMessage": data.EpilogueMessage,
-            //                        "ThanksMessage": data.ThanksMessage,
-            //                        "Status": data.Status,
-            //                        "ValidTimeActive": data.ValidTimeActive,
-            //                        "ValidStartTime": (data.ValidTimeActive == 0 ? "" : data.ValidStartTime),
-            //                        "ValidEndTime": (data.ValidTimeActive == 0 ? "" : data.ValidEndTime),
-            //                        "CRM_CustomerIdActive": data.CRM_CustomerIdActive == 1,
-            //                        "CRM_ContractIdActive": data.CRM_ContractIdActive == 1,
-            //                        "ThankPageButtonActive": data.ThankPageButtonActive == 1,
-            //                        "ThankPageButtonText": data.ThankPageButtonText,
-            //                        "ThankPageButtonUrl": data.ThankPageButtonUrl,
-            //                        "Emails": data.Emails,
-            //                    };
-            //                    data.QuestionDatas.forEach(e => {
-            //                        var leftitem = JSON.parse(e.JsonSetting);
-            //                        if (typeof leftitem.Other === "undefined") {
-            //                            leftitem.Other = {
-            //                                Need: false,
-            //                                Title: "",
-            //                            }
-            //                        }
-            //                        if (typeof leftitem.None === "undefined") {
-            //                            leftitem.None = {
-            //                                Need: false,
-            //                                Title: "",
-            //                            }
-            //                        }
-            //                        leftitem.TopicOptions.forEach(e => {
-            //                            if (typeof e.Id === "undefined") {
-            //                                e.Id = _this.Guid();
-            //                            }
-
-            //                        })
-
-
-            //                        _this.LeftItems.push(leftitem);
-
-            //                    });
-
-
-            //                    //this.highlightedIndex = -1;
-            //                    _this.QEditor.Preface.root.innerHTML = data.PrefaceMessage;
-            //                    _this.QEditor.Epilogue.root.innerHTML = data.EpilogueMessage;
-            //                    _this.QEditor.Thanks.root.innerHTML = data.ThanksMessage;
-            //                    _this.LinkQuestions = data.LinkQuestions;
-
-            //                    surveyList.IsShow = false;
-
-
-
-            //                },
-            //                "IsLoading"
-
-            //            )
-
-
-            //        },
-            //        SurveyDataProcess() {
-            //            var _this = this;
-            //            _this.SurveyData.PrefaceMessage = _this.QEditor.Preface.root.innerHTML;
-            //            _this.SurveyData.EpilogueMessage = _this.QEditor.Epilogue.root.innerHTML;
-            //            _this.SurveyData.ThanksMessage = _this.QEditor.Thanks.root.innerHTML;
-            //            var surveyData = JSON.parse(JSON.stringify(_this.SurveyData));
-            //            var questionDatas = [];
-            //            _this.LeftItems.forEach((data) => {
-            //                questionData = {
-            //                    SurveyId: "",
-            //                    Id: data.Id,
-            //                    Title: data.Title,
-            //                    Remark: data.Remark,
-            //                    Type: data.Type,
-            //                    JsonSetting: JSON.stringify(data)
-            //                };
-            //                questionDatas.push(questionData);
-            //            });
-            //            surveyData.QuestionDatas = questionDatas;
-
-
-
-            //            surveyData.LinkQuestions = _this.LinkQuestions;
-
-
-            //            return surveyData;
-            //        },
-            //        Save() {
-            //            var _this = this;
-
-            //            var MainForm = $('#MainForm').valid();
-            //            var QuestionForm = $('#QuestionForm').valid();
-
-
-            //            if (!QuestionForm) {
-            //                openWarningDialog("題目設計-有欄位未填寫", 10);
-            //                return;
-            //            }
-
-            //            if (!MainForm) {
-            //                openWarningDialog("問卷設定-有欄位未填寫", 10);
-
-            //            }
-
-            //            if (!MainForm || !QuestionForm) {
-
-            //                return;
-            //            }
-
-
-
-            //            SmartMessageBox({
-            //                title: "警告",
-            //                message: "確定要發布問卷嗎?",
-            //                callback(res) {
-            //                    if (res) {
-            //                        _this.ReturnAjax(
-            //                            "Api/Admin/SaveSurvey.ashx",
-            //                            {
-            //                                "SurveyData": encodeURIComponent(JSON.stringify(_this.SurveyDataProcess())),
-            //                            },
-            //                            function (result) {
-
-            //                                var surveyId = result.Data;
-            //                                _this.SurveyData.Id = surveyId;
-
-            //                                _this.Page = 4;
-            //                            },
-            //                            "IsLoading"
-            //                        )
-            //                    }
-            //                }
-            //            })
-
-            //        },
-            //        Preview() {
-            //            var _this = this;
-
-            //            _this.ReturnAjax(
-            //                "Api/Admin/SaveTempSurvey.ashx",
-            //                {
-            //                    "SurveyData": encodeURIComponent(JSON.stringify(_this.SurveyDataProcess())),
-            //                },
-            //                function (result) {
-            //                    var surveyId = result.Data;
-            //                    window.open(master.RootUrl + "Admin/Preview.aspx?Id=" + surveyId)
-            //                },
-            //                "IsLoading"
-
-            //            )
-
-
-
-            //        },
-            //        ReturnAjax(url, data, callback, loadingName) {
-            //            var _this = this;
-            //            if (loadingName == undefined) loadingName = 'IsLoading';
-            //            return $.ajax({
-            //                url: master.RootUrl + url,
-            //                type: "POST",
-            //                async: true,
-            //                cache: false,
-            //                data: data,
-            //                dataType: 'json',
-            //                //之前
-            //                beforeSend() {
-            //                    _this[loadingName] = true;
-            //                },
-            //                //成功
-            //                success: function (result) {
-            //                    if (result.StatusCode == 200) {
-            //                        callback(result);
-            //                    } else {
-            //                        openWarningDialog(result.StatusCode + ' : ' + result.StatusMsg);
-            //                        console.error(result.StatusExceptionMsg);
-            //                    }
-            //                },
-            //                //錯誤
-            //                error: function (xhr, textStatus, errorThrown) {
-            //                    openWarningDialog(xhr.status + ' : ' + xhr.statusText);
-            //                    console.error(xhr.responseText);
-            //                },
-            //                //之後
-            //                complete: function () {
-            //                    _this[loadingName] = false;
-            //                },
-            //            });
-            //        },
-            //        WatchNumber() {
-            //            //var tempIndex = 0;
-            //            var number1 = 1;
-            //            this.LeftItems.forEach((data, index) => {
-            //                data.Number = " ";
-            //                //有縮排
-            //                if (data.IndentNeed) {
-            //                    var preItem = this.LeftItems[index - 1];
-            //                    if (preItem === undefined || !preItem.IndentNeed) {
-            //                        data.Number = 1;
-            //                    }
-            //                    else if (preItem.IndentNeed) {
-            //                        data.Number = preItem.Number + 1;
-            //                    }
-            //                }
-            //                else if (data.Type == 7 || data.Type == 8) {
-            //                    //data.Number = " ";
-
-            //                }
-            //                //沒縮排
-            //                else {
-            //                    data.Number = number1;
-            //                    number1++;
-            //                }
-            //            });
-
-            //        },
-            //        ItemCopy(leftitems, item, index) {
-            //            var copyItem = JSON.parse(JSON.stringify(item));
-            //            copyItem.Id = this.Guid();
-            //            leftitems.splice(index + 1, 0, copyItem);
-            //        },
-            //        ItemDelete(leftitems, index) {
-            //            var _this = this;
-            //            SmartMessageBox({
-            //                title: "警告",
-            //                message: "你確定要刪除嗎?",
-            //                callback(res) {
-            //                    if (res) {
-            //                        var data = leftitems[index];
-            //                        var LinkQuestions = [];
-            //                        _this.LinkQuestions.forEach(e => {
-
-            //                            if (e.Id != data.Id) {
-            //                                LinkQuestions.push(e)
-            //                            }
-            //                        });
-            //                        _this.LinkQuestions = LinkQuestions;
-
-            //                        leftitems.splice(index, 1)
-            //                    }
-            //                }
-            //            })
-            //        },
-            //        NumberToLetter(number) {
-            //            const letters = 'abcdefghijklmnopqrstuvwxyz';
-
-            //            if (number <= 26) {
-            //                return letters[number - 1];
-            //            } else {
-            //                let result = '';
-
-            //                while (number > 0) {
-            //                    const remainder = (number - 1) % 26;
-            //                    result = letters[remainder] + result;
-            //                    number = Math.floor((number - 1) / 26);
-            //                }
-
-            //                return result;
-            //            }
-            //        },
-            //        TopicOptionUp(topicOptions, index) {
-            //            if (index != 0) {
-
-            //                let item = topicOptions.splice(index, 1)[0];
-            //                topicOptions.splice(index - 1, 0, item);
-            //            }
-            //        },
-            //        TopicOptionDown(topicOptions, index) {
-            //            var length = topicOptions.length;
-            //            if (index != length - 1) {
-            //                let item = topicOptions.splice(index, 1)[0];
-            //                topicOptions.splice(index + 1, 0, item);
-            //            }
-            //        },
-            //        TopicOptionPlus(topicOptions, index) {
-            //            var item = {
-            //                Title: "",
-            //                Id: this.Guid()
-            //            };
-            //            topicOptions.splice(index + 1, 0, item);
-            //        },
-            //        TopicOptionMinus(item, index) {
-            //            if (item.TopicOptions.length > 1) {
-
-            //                var option = item.TopicOptions[index];
-            //                var linkQuestionIndex = this.LinkQuestions.findIndex(e => e.Id == item.Id && e.OptionId == option.Id);
-            //                if (linkQuestionIndex != -1) {
-            //                    this.LinkQuestions.splice(linkQuestionIndex, 1)
-            //                }
-
-            //                item.TopicOptions.splice(index, 1)
-            //            }
-
-            //        },
-            //        AllowDrop(event) {
-            //            event.preventDefault();
-            //        },
-            //        RightDrag(event, item) {
-            //            console.log(-1);
-            //            this.highlightedIndex = -1;
-            //            item.block = "right";
-            //            item.Id = this.Guid();
-            //            event.dataTransfer.setData("text", JSON.stringify(item));
-            //        },
-            //        RightDrop(event) {
-            //            event.preventDefault();
-            //        },
-            //        LeftDrag(event, item, index) {
-            //            item.block = "left"
-            //            item.index = index
-            //            event.dataTransfer.setData("text", JSON.stringify(item));
-            //        },
-            //        LeftDrop(event) {
-            //            event.preventDefault();
-            //            var itemData = JSON.parse(event.dataTransfer.getData("text"));
-            //            var newItem = itemData;
-
-            //            //從右邊拖到左邊
-            //            if (itemData.block == "right" && ($(event.target).hasClass("left") || $(event.target).parents(".left").length > 0)) {
-
-
-            //                newItem.Title = "";
-            //                newItem.Type = newItem.value;
-            //                newItem.Remark = "";
-            //                newItem.RequestNeed = false;
-            //                newItem.RemarkNeed = false;
-            //                newItem.VerifyNeed = false;
-            //                newItem.IndentNeed = false;
-            //                //其他
-            //                newItem.Other = {
-            //                    Need: false,
-            //                    Title: "其他",
-
-            //                };
-            //                //以上皆非
-            //                newItem.None = {
-            //                    Need: false,
-            //                    Title: "其他",
-
-            //                };
-            //                newItem.UploadSetting = {
-            //                    FileSize: 5,
-            //                    FileFormatRestrictions: true,
-            //                    Word: true,
-            //                    Image: true,
-            //                    PPT: true,
-            //                    Video: true,
-            //                    Excel: true,
-            //                    Audio: true
-            //                }
-
-            //                newItem.TopicOptions = [];
-            //                if (newItem.Type == 3 || newItem.Type == 4) {
-            //                    newItem.TopicOptions.push({
-            //                        Title: "",
-            //                        Id: this.Guid()
-            //                    })
-            //                }
-
-            //                if (this.highlightedIndex === -1) {
-            //                    this.LeftItems.push(newItem);
-            //                } else {
-            //                    this.LeftItems.splice(this.highlightedIndex, 0, newItem);
-            //                }
-
-            //            }
-            //            else if (itemData.block == "left" && ($(event.target).hasClass("left") || $(event.target).parents(".left").length > 0)) {
-            //                var oldIndex = this.LeftItems.findIndex(element => element.Id == newItem.Id);
-
-            //                if (oldIndex != this.highlightedIndex) {
-            //                    var element = this.LeftItems.splice(oldIndex, 1);  // 移除一个元素，返回移除的元素
-            //                    this.LeftItems.splice(this.highlightedIndex, 0, element[0]);
-            //                }
-
-
-            //            }
-            //        },
-            //        DragEnter(event, index) {
-            //            event.preventDefault();
-            //            console.log(index);
-            //            this.highlightedIndex = index;
-            //        },
-            //        DragLeave(event, index) {
-            //            event.preventDefault();
-            //            //console.log(-1);
-            //            //this.highlightedIndex = -1;
-            //        },
-            //        Cancel() {
-
-            //            this.IsShow = false;
-            //        },
-            //        Afterleave() {
-            //            surveyList.GetSurveyTableDraw();
-            //            surveyList.IsShow = true;
-            //        },
-            //        OpenResultLink() {
-            //            window.open(master.RootUrl + "Admin/Result/Review.aspx?Id=" + this.SurveyData.Id);
-            //        },
-            //        Guid() {
-            //            function s4() {
-            //                return Math.floor((1 + Math.random()) * 0x10000)
-            //                    .toString(16)
-            //                    .substring(1);
-            //            }
-            //            return (
-
-            //                s4() +
-            //                s4() +
-            //                '-' +
-            //                s4() +
-            //                '-' +
-            //                s4() +
-            //                '-' +
-            //                s4() +
-            //                '-' +
-            //                s4() +
-            //                s4() +
-            //                s4()
-            //            );
-            //        }
-            //    }
-            //})
-
         });
-
-
     </script>
     }

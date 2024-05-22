@@ -1,4 +1,5 @@
 ﻿using CellReport_Workflow.Models.Sql;
+using CellReport_Workflow.ViewModel;
 using Microsoft.Data.SqlClient;
 
 namespace CellReport_Workflow.Models.Record
@@ -16,8 +17,22 @@ namespace CellReport_Workflow.Models.Record
             sql += "left join EMPLOYEE E ON E.emp_id = C.emp_id";
             sql += " WHERE  cus_ct_id  = @K_cus_ct_id ";
             Paras.Add(new SqlParameter("K_cus_ct_id", cus_ct_id));
-            datas= ReportReader(datas, sql, Paras);
+            datas = ReportReader(datas, sql, Paras);
             return datas;
+        }
+        public string GetUpLoadRecord(string cus_ct_id)
+        {
+            List<SqlParameter> Paras = new();
+            string sql = "SELECT TOP(1) [datetime] FROM cr_SignRecord WHERE stage = @K_state AND cus_ct_id  = @K_cus_ct_id order by Id desc ";
+            Paras.Add(new SqlParameter("K_cus_ct_id", cus_ct_id));
+            Paras.Add(new SqlParameter("K_state", CDictionary.STAGE_RELEASE));
+            string datatime = sqlBase.StringReader(sql, "datetime", Paras);
+            if (!string.IsNullOrEmpty(datatime) && datatime != CDictionary.ERR)
+            {
+                return datatime;
+            }
+            else
+                return "";
         }
 
 
@@ -38,7 +53,7 @@ namespace CellReport_Workflow.Models.Record
                             Record x = new();
                             x.Id = !dr.IsDBNull(dr.GetOrdinal("Id")) ? dr["Id"].ToString() : "";//
                             x.cus_ct_id = !dr.IsDBNull(dr.GetOrdinal("cus_ct_id")) ? dr["cus_ct_id"].ToString() : "";//
-                            x.datetime = !dr.IsDBNull(dr.GetOrdinal("datetime")) ? DateTimeConverter(dr["datetime"].ToString()) : "";                            
+                            x.datetime = !dr.IsDBNull(dr.GetOrdinal("datetime")) ? DateTimeConverter(dr["datetime"].ToString()) : "";
                             x.emp_id = !dr.IsDBNull(dr.GetOrdinal("emp_id")) ? dr["emp_id"].ToString() : "";
                             x.stage = !dr.IsDBNull(dr.GetOrdinal("stage")) ? dr["stage"].ToString() : "";//
                             x.state = !dr.IsDBNull(dr.GetOrdinal("state")) ? dr["state"].ToString() : "";//

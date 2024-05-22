@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CellReport_Workflow")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7ba6e28326cf602c047b5df28449071344b767db")]
 [assembly: System.Reflection.AssemblyProductAttribute("CellReport_Workflow")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CellReport_Workflow")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

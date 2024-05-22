@@ -16,7 +16,7 @@
     <link href="~/css/vendors.bundle.css" rel="stylesheet" />
     <link href="~/css/app.bundle.css" rel="stylesheet" />
     <link href="~/css/fa-solid.css" rel="stylesheet" />
-    @*<link href="~/css/notifications/toastr/toastr.css" rel="stylesheet" />*@
+        @*<link href="~/css/notifications/toastr/toastr.css" rel="stylesheet" />*@
     <link href="~/css/themes/cust-theme-custom.css" rel="stylesheet" />
     <link href="~/js/vue-loading-overlay/vue-loading.css" rel="stylesheet" />
     <link href="~/css/datagrid/datatables/datatables.bundle.css" rel="stylesheet" />
@@ -24,7 +24,7 @@
     <link href="~/js/vue-multiselect/vue-multiselect.min.css" rel="stylesheet" />
     <link href="~/css/toastr.css" rel="stylesheet" />
 
-            @*<asp:ContentPlaceHolder ID="head" runat="server">-------------------------------------------------------------------------*************
+        @*<asp:ContentPlaceHolder ID="head" runat="server">-------------------------------------------------------------------------*************
     </asp:ContentPlaceHolder>*@
     <script>
         paceOptions = {
@@ -37,7 +37,6 @@
         };
 
     </script>
-
 </head>
 <body class="mod-bg-1 header-function-fixed nav-function-fixed mod-hide-info-card mod-nav-link">
     <!-- BEGIN Page Wrapper -->
@@ -65,23 +64,45 @@
                                 <span class="nav-link-text">報告列表</span>
                             </a>
                         </li>
-                    </ul>
-                    <ul id="js-nav-menu" class="nav-menu waitSing" >
-                        <li>
+                        @*</ul>*@
+                        @* <ul id="js-nav-menu" class="nav-menu waitSing" style="display:none">*@
+                        <li class="waitSing" style="display:none">
                             <a asp-controller="Report" asp-action="WaitIndex">
                                 <i class="fal fa-book"></i>
                                 <span class="nav-link-text">待簽報告</span>
                             </a>
                         </li>
-                    </ul>
-                    <ul id="js-nav-menu" class="nav-menu">
+                        @*</ul>*@
+                        @*<ul id="js-nav-menu" class="nav-menu">*@
                         <li>
                             <a asp-controller="Modify" asp-action="Index">
                                 <i class="fal fa-book"></i>
                                 <span class="nav-link-text">報告修正申請</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="#" title="Font Icons" data-filter-tags="font icons">
+                                <i class="ni ni-bell"></i>
+                                <span class="nav-link-text" data-i18n="nav.form_stuff">設定</span>
+                            </a>
+                            <ul>
+                                <li>
+                                    <a asp-action="MailSetting" asp-controller="Setting" title="Light" data-filter-tags="font icons fontawesome light">
+                                        <i class="ni ni-bar-chart"></i>
+                                        <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_light">通知人員設定</span>
+                                    </a>
+                                </li>
+                                @* <li>
+                                    <a asp-action="MailSetting" asp-controller="Setting" title="Regular" data-filter-tags="font icons fontawesome regular">
+                                        <i class="ni ni-user-follow"></i>
+                                        <span class="nav-link-text" data-i18n="nav.font_icons_fontawesome_regular">簽核人員設定</span>
+                                    </a>
+                                </li> *@
+                            </ul>
+                        </li>
                     </ul>
+
+
 
 
                     <div class="filter-message js-filter-message bg-success-600"></div>
@@ -152,7 +173,7 @@
                                     </div>
                                 </div>
 
-                                <a class="dropdown-item fw-500 pt-3 pb-3" asp-controller="Login" asp-action="Logout">
+                                <a class="dropdown-item fw-500 pt-3 pb-3" asp-controller="Login" asp-action="Logout" id="logout">
                                     <span>登出</span>
                                 </a>
                             </div>
@@ -227,7 +248,6 @@
                     $(this).addClass("active open");
                 }
                 count++;
-
             })
 
             if (typeof $.validator == "function") {
@@ -255,6 +275,7 @@
         const ID = '@ViewBag.U.Emp_Id';
         const NAME = '@ViewBag.U.Account';
         const DEPARTMENT = decodeHtmlEntities('@ViewBag.U.Department');
+        const DEPARTMENT_RANK = decodeHtmlEntities('@ViewBag.U.Department_Rank');
         const RANK = decodeHtmlEntities('@ViewBag.U.Rank');
         const PAGE = '@ViewBag.U.PageEnAble';
         $("#P_NAME").text(NAME);
@@ -264,20 +285,46 @@
             return elem.value;
         }
         //waitSing
-        if(RANK != "部門主管"){
-            $(".waitSing").css("display","none")
-        }
-
 
 
         const STATUS = {
             LAB_SEND: "Lab送出資料",
             QC_SING: "品質主管複核",
             LAB_SING: "Lab主管複核",
+            SING_FINISH: "簽核完成",
             RELEASE: "報告上傳"
         }
+        const SYSRANK = {
+            LAB: "實驗室主管",
+            QC: "品質主管"
+        }
+        if (RANK == SYSRANK.LAB || RANK == SYSRANK.QC) {
+            $(".waitSing").css("display", "");
+        }
+
+       
+        function delCookie(name){
+            var cval;
+            var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+            if (arr = document.cookie.match(reg)) {
+                cval = decodeURI(arr[2]);
+            } else {
+                cval = null;
+            }
+            var exp = new Date();
+            exp.setTime(exp.getTime() - 1);
+            if (cval != null) {
+                document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+            }
+        }
+        $("#logout").on("click", function () {
+            delCookie("cookie_sendUploadNoty");
+            delCookie("cookie_sendNoty");
+        });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
+
+
 
 </body>
 </html>

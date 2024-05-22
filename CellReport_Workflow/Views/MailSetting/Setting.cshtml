@@ -1,0 +1,365 @@
+﻿@{
+    Layout = "_Layout1";
+}
+<div class="row">
+    <div class="col-lg-12 col-md-12">
+        <div class="panel"
+             data-panel-collapsed="false"
+             data-panel-fullscreen="false"
+             data-panel-close="false"
+             data-panel-locked="false"
+             data-panel-refresh="false"
+             data-panel-custombutton="false"
+             data-panel-reset="false"
+             data-panel-color="false">
+            <div class="panel-hdr  bg-fusion-500"></div>
+
+            <div class="panel-container show ">
+                <div id="MailSetting">
+                    <div style="margin-left:35px; padding:10px">
+                        <h1 id="titel" style=" text-align:center;">{{LabChoosed}} 通知名單</h1>
+                        <vue-select class="col-lg-3 col-md-3 mb-1" v-model="LabChoosed" v-on:change="MailTableChange" id="sel_Lab"
+                                    v-bind:options="Options">
+                            簽核狀態
+                        </vue-select>
+                       @* <i>請選取: </i>
+                        <select id="sel_Lab" class="form-select " aria-label="Default select example" v-on:change="MailTableChange" v-model="LabChoosed">
+                            <option value="台北造血實驗室" selected>台北造血實驗室</option>
+                            <option value="細胞實驗室">細胞實驗室</option>
+                        </select>*@
+                        <button type="button" class="btn btn-secondary waves-effect btn-xs waves-themed search" style="margin-left:3px" data-toggle="modal" data-target="#Search_Emp" id="btn_search" v-on:click="ShowLabAdd">新增人員</button>
+                    </div>
+
+                    <div class="col-xl-12">
+                        <table id="LabMailTable" class="table table-bordered table-hover table-striped w-100">
+                        </table>
+                    </div>
+
+                    <div class="modal bd-example-modal-lg" id="Search_Emp" tabindex="-1" role="dialog" aria-labelledby="Search_EmpModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="Search_EmpModalLabel">新增搜尋</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="cancel1_22">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div style="display:flex;" class="cent">
+                                        <input class="form-control" style="width:80%" id="i_search" v-model="LabChoosed" />
+                                        <button type="button" class="btn btn-secondary" id="Search" v-on:click="LabAddSearch">查詢</button>
+                                    </div>
+                                    <table id="dt-search" class="table table-bordered table-hover table-striped w-100">
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal bd-example-modal-lg" id="Phone_Edit" tabindex="-1" role="dialog" aria-labelledby="Phone_EditlLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="Phone_EditLabel"></h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="cancel1_8">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <input class="form-control" id="i_Phone_Edit" />
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelPhone_Edit">取消</button>
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="updatePhone_Edit">儲存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts{
+    <script>
+        var MailSetting = new Vue({
+            el: "#MailSetting",
+            data: {
+                dataShow: {
+                    emp_Id: "",
+                    phone: "",
+                    account: "",
+                    name: "",
+                    Index: "",
+                },
+                Options: [
+                    { "text": "請選擇", "value": "" },
+                    { "text": "細胞實驗室", "value": "細胞實驗室" },
+                    { "text": "造血實驗室", "value": "造血實驗室" },
+                    { "text": "資料組", "value": "資料組" },
+                    { "text": "Lab主管主管", "value": "實驗室主管" },
+                    { "text": "品質主管", "value": "品質主管" }
+                ],
+                LabChoosed: "細胞實驗室",//DEPARTMENT,
+                querystring:"",
+                LabMailTable: {},
+                dt_search:{},
+                search:"",
+            },
+            mounted(){
+                this.InitLabMailTable();
+            },
+            methods: {
+                InitLabMailTable(){
+                    var _this = this;
+                    _this.LabMailTable = $('#LabMailTable').DataTable({
+
+                        ajax: {
+                            url: `@Url.Content("~/MailSetting/getMemberList")`,
+                            dataSrc: "",
+                            type: "POST",
+                            data: {
+                                Department: _this.LabChoosed,
+                            }
+                        },
+                        paging: true,
+                        fixedHeader: true,
+                        select: 'single',
+                        order: [4, 'desc'],
+                        //columnDefs: [
+                        //    {
+                        //        defaultContent: `<i style="color:red !important">無手機號碼無法通知，請點選編輯</i>`,
+                        //        targets: [5]
+                        //    },
+                        //    {
+                        //        defaultContent: "-",
+                        //        targets: [2, 3]
+                        //    }
+                        //],
+                        //rowCallback: function (row, data, index) {
+                        //    if (index % 2 == 0) {
+                        //        $(row).removeClass('myodd myeven');
+                        //        $(row).addClass('myodd');
+                        //    } else {
+                        //        $(row).removeClass('myodd myeven');
+                        //        $(row).addClass('myeven');
+                        //    }
+                        //},
+                        columns: [
+                            {
+                                title: "編輯",
+                                targets: -1,
+                                data: null,
+                                defaultContent: `<button type="button" class="EditPhone" style="background-color:transparent; border-style:none;" data-toggle="modal" data-target="#Phone_Edit"><i class="fal fa-edit mr-1" style="width:5%"></i></button>`
+                            },
+                            {
+                                title: "刪除",
+                                targets: -1,
+                                data: null,
+                                defaultContent: `<button type="button" class= "DeleteUser" style="background-color:transparent; border-style:none;"><i class="ni ni-close" style="color:red !important"></i></button >`
+                            },
+                            {
+                                title: "員編",
+                                id: "q",
+                                data: "emp_Id",
+                                type: "text"
+                            },
+                            {
+                                title: "姓名",
+                                id: "qs",
+                                data: "name",
+                                type: "text"
+                            },
+                            {
+                                title: "帳號",
+                                id: "qs",
+                                data: "account",
+                                type: "text"
+                            },
+                            {
+                                title: "手機",
+                                id: "qw",
+                                data: "phone",
+                                type: "text"
+                            }
+                        ],
+                        lengthMenu: [10, 20, 30, 40, 50],
+                        language: {url: `@Url.Content("~/lang/dataTables/tw.json")`},
+                        //<'row'<'col-6'><'col-6 d-flex align-items-center justify-content-end'B>>
+                        dom: `<'row'<'col-sm-12'tr>><'row'<'col-4'i><'col-4'p><'col-4'l>>`,
+                        buttons: [
+                            {
+                                text: '新增',
+                                className: "btn btn-secondary waves-effect waves-themed search",
+                                action: function (e, dt, node, config) {
+                                    //alert('Button activated');
+                                }
+                            }
+                        ]
+                    });
+                },
+                Initdt_search(){
+                    var _this = this;
+                    _this.dt_search = $('#dt-search').DataTable({
+                        ajax: {
+                            url: `@Url.Content("~/LN2_Setting/SearchUser")`,
+                            dataSrc: "",
+                            type: "POST",
+                            data: {
+                                QueryString: _this.querystring,
+                            }
+                        },
+                        paging: true,
+                        fixedHeader: true,
+                        select: 'single',
+                        order: [1, 'desc'],
+                        columnDefs: [
+                            {
+                                defaultContent: "-",
+                                targets: "_all",
+                            }
+                        ],
+                        //rowCallback: function (row, data, index) {
+                        //    if (index % 2 == 0) {
+                        //        $(row).removeClass('myodd myeven');
+                        //        $(row).addClass('myodd');
+                        //    } else {
+                        //        $(row).removeClass('myodd myeven');
+                        //        $(row).addClass('myeven');
+                        //    }
+                        //},
+                        columns: [
+                            {
+                                title: "加入",
+                                targets: -1,
+                                data: null,
+                                defaultContent: `<button type="button" class="AddUser" style="background-color:transparent; border-style:none;" data-dismiss="modal"><i class="ni ni-user-follow mr-1" style="width:5%"></i></button>`
+                            },
+                            {
+                                title: "員編",
+                                id: "qyy",
+                                data: "emp_Id",
+                                type: "text"
+                            },
+                            {
+                                title: "姓名",
+                                id: "qs",
+                                data: "name",
+                                type: "text"
+                            },
+                            {
+                                title: "帳號",
+                                id: "qsyy",
+                                data: "account",
+                                type: "text"
+                            }
+                        ],
+                        lengthMenu: [8],
+                        language: { url: `@Url.Content("~/lang/dataTables/tw.json")` },
+                        dom: `<'row'<'col-sm-12'tr>><'row'<'col-4'i><'col-8'p>>`,
+                    });
+                },
+
+                LabMailDeleteEven() {
+                    $('#LabMailTable tbody').on('click', '.DeleteUser', function () {
+                        let table = $('#LabMailTable').DataTable();
+                        let parentRow = $(this).parents('tr')
+                        let selectIndex = table.row(parentRow).index();
+                        let data = table.row(parentRow).data();
+                        dataShow = {
+                            emp_Id: data.emp_Id,
+                            phone: data.phone,
+                            account: data.account,
+                            Index: selectIndex,
+                            name: data.name
+                        }
+                        $.ajax({
+                            url: `@Url.Content("~/LN2_Setting/RemoveUserFromTank")`,
+                            type: "post",
+                            dataType: "json",
+                            data: {
+                                Emp_Id: dataShow.emp_Id,
+                                Unit_ID: LabChoosed
+                            }
+                        })
+                            .done(data => {
+                                if (data == "OK") {
+                                    $("#LabMailTable").DataTable().row(dataShow.Index).remove().draw(false);
+                                }
+                                else
+                                    Note("error", "刪除失敗");
+                            });
+                    });
+                },
+
+                MailTableChange(){
+                    if ($.fn.dataTable.isDataTable('#LabMailTable')) {
+                        LabChoosed = $("#sel_Lab").val();
+                        $("#titel").text(` ${LabChoosed} 通知名單`)
+                        $("#LabMailTable").DataTable().destroy();
+                        $('#LabMailTable').empty();
+                        this.InitLabMailTable();
+                    }
+                },
+
+                ShowLabAdd(){
+                    this.search = "";
+                    $("#dt-search").DataTable().destroy();
+                    $('#dt-search').empty();
+                    this.Initdt_search();
+                },
+
+                LabAddSearch(){
+                    $("#dt-search").DataTable().destroy();
+                    $('#dt-search').empty();
+                    datatable_Search = Dtable_Search(document.getElementById("i_search").value, LabChoosed);
+
+                    $('#dt-search tbody').on('click', '.AddUser', function () {
+                        let table = $('#dt-search').DataTable();
+                        let parentRow = $(this).parents('tr')
+                        let selectIndex = table.row(parentRow).index();
+                        let datas = table.row(parentRow).data();
+                        $("#Search_Emp").modal('hide')
+                        $.ajax({
+                            url: `@Url.Content("~/LN2_Setting/AddUserToGroup")`,
+                            type: "post",
+                            dataType: "json",
+                            data: {
+                                Emp_Id: datas.emp_Id,
+                                Department: LabChoosed
+                            }
+                        })
+                            .done(data => {
+                                if (data != null) {
+                                    $("#LabMailTable").DataTable().row.add(data).draw(false);
+                                    Note("success", `${datas.account} 成功新增至 ${LabChoosed}`);
+                                }
+                                else
+                                    Note("error", "新增失敗");
+                            });
+                    });
+                },
+
+
+
+
+
+
+            },
+        });
+
+
+
+
+
+
+
+        //----------------------------------------------------------------------------
+
+     
+    </script>
+}

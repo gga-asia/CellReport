@@ -1,5 +1,7 @@
 ﻿using CellReport_Workflow.Interface;
+using CellReport_Workflow.Models.EditLog;
 using CellReport_Workflow.Models.Modify;
+using CellReport_Workflow.Models.Record;
 using CellReport_Workflow.Models.Report;
 using CellReport_Workflow.Models.User;
 using CellReport_Workflow.ViewModel;
@@ -38,6 +40,7 @@ namespace CellReport_Workflow.Controllers
                 user.Account = data.Account;
                 user.Emp_Id = data.Emp_Id;
                 user.Department = data.Department;
+                user.Department_Rank = data.Department_Rank;
                 user.Rank = data.Rank;
                 user.Name = data.Name;
                 return user;
@@ -79,7 +82,7 @@ namespace CellReport_Workflow.Controllers
             {
                 datas = ModifyFactory.GetModifyListByLab(Id, ProductType, Finish_s, Finish_e, "");
             }
-            
+
             return Json(datas);
         }
 
@@ -165,6 +168,10 @@ namespace CellReport_Workflow.Controllers
             if (!string.IsNullOrEmpty(user.Emp_Id))
             {
                 sta = modify_ADO.INSERT_ModifyApply(Id, Reson, user);
+                if (sta == CDictionary.OK)
+                {
+
+                }
                 return Json(sta);
             }
             else return Json("請重新登入");
@@ -174,20 +181,42 @@ namespace CellReport_Workflow.Controllers
         public IActionResult ApplyCheck(string Id)//新申請檢查
         {
             string sta = ModifyFactory.CheckApply(Id);
-            if (!string.IsNullOrEmpty(sta) && sta != CDictionary.ERR) 
+            if (!string.IsNullOrEmpty(sta) && sta != CDictionary.ERR)
                 sta = $"{Id} 已由 {sta} 提出申請";
             return Json(sta);
         }
 
         [HttpPost]
-        public IActionResult Reply(string Id, string reply, string reply_remark)//主管回復申請
+        public IActionResult Reply(string Id, string Cus_CT_ID, string reply, string reply_remark, string apply_By, string reson)//主管回復申請
         {
             User? user = GetUserSession();
             string sta = "";
-            if (!string.IsNullOrEmpty(user.Emp_Id) && user.Rank == CDictionary.LAB_MANAGER)
+            if (!string.IsNullOrEmpty(user.Emp_Id) && user.Department_Rank == CDictionary.MANAGER)
             {
+                Report report = new ReportFactory().Get_cr_main(Cus_CT_ID);
                 sta = modify_ADO.Updata_ModifyReply(Id, reply, reply_remark, user);
+                if (reply == "同意")
+                {
+                    //List<List<string>> path = new();
+                    if (report == null)
+                        return Json("報告資料異常");
+                    if (!string.IsNullOrEmpty(report.CurrentVersion))
+                        report.CurrentVersion = (Convert.ToInt32(report.CurrentVersion)).ToString();
+                    else
+                        report.CurrentVersion = "1";
 
+                    //_ = _IFileService.UnSignBackUp_To_InProgress(Cus_CT_ID);
+                    List<List<string>> path = _IFileService.backupeUploadReport(Cus_CT_ID, report.CurrentVersion, report.Upload_Date);
+                    if (path.Count > 0)
+                    {
+                        string datatime = new RecordFactory().GetUpLoadRecord(Cus_CT_ID);
+                        sta = new EditLog_ADO().BackReportLog(report.SEQ_NUM, datatime, apply_By, reson, path[1], path[0]);
+                    }
+                    else
+                    {
+                        return Json(CDictionary.ERR);
+                    }
+                }
 
                 return Json(sta);
             }

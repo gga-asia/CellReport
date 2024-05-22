@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\En\\細胞報告電子簽核\\CellReport_Workflow\\CellReport_Workflow\\CellReport_Workflow.csproj": {}
+    "C:\\GitHub\\CellReport\\CellReport_Workflow\\CellReport_Workflow.csproj": {}
   },
   "projects": {
-    "C:\\En\\細胞報告電子簽核\\CellReport_Workflow\\CellReport_Workflow\\CellReport_Workflow.csproj": {
+    "C:\\GitHub\\CellReport\\CellReport_Workflow\\CellReport_Workflow.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\En\\細胞報告電子簽核\\CellReport_Workflow\\CellReport_Workflow\\CellReport_Workflow.csproj",
+        "projectUniqueName": "C:\\GitHub\\CellReport\\CellReport_Workflow\\CellReport_Workflow.csproj",
         "projectName": "CellReport_Workflow",
-        "projectPath": "C:\\En\\細胞報告電子簽核\\CellReport_Workflow\\CellReport_Workflow\\CellReport_Workflow.csproj",
+        "projectPath": "C:\\GitHub\\CellReport\\CellReport_Workflow\\CellReport_Workflow.csproj",
         "packagesPath": "C:\\Users\\JosephYang\\.nuget\\packages\\",
-        "outputPath": "C:\\En\\細胞報告電子簽核\\CellReport_Workflow\\CellReport_Workflow\\obj\\",
+        "outputPath": "C:\\GitHub\\CellReport\\CellReport_Workflow\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\JosephYang\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -51,6 +51,14 @@
             "System.DirectoryServices": {
               "target": "Package",
               "version": "[7.0.1, )"
+            },
+            "iTextSharp": {
+              "target": "Package",
+              "version": "[5.5.13.3, )"
+            },
+            "itext7": {
+              "target": "Package",
+              "version": "[8.0.4, )"
             }
           },
           "imports": [
@@ -72,7 +80,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101\\RuntimeIdentifierGraph.json"
         }
       }
     }

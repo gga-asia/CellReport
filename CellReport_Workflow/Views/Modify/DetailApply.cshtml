@@ -76,17 +76,32 @@
                         <div class="col-12 pt-0 pr-3 pl-3" style="height: 100px; display:none" id="Apply">
                             <label class="form-label" for="example-textarea"> 申請原因:</label>
                             <textarea class="form-control" id="example-textarea" rows="1" v-model.trim="Reson"></textarea>
+                            <br />
+                            <label class="form-label" for="example-textarea">請勾選需修改的報告:</label>
+                            @* <div id="SelectReport">
+                                <div class="frame-wrap">
+                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                        <input type="checkbox" class="custom-control-input" id="defaultInline1">
+                                        <label class="custom-control-label" for="defaultInline1">123</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                        <input type="checkbox" class="custom-control-input" id="defaultInline2" >
+                                        <label class="custom-control-label" for="defaultInline2">456</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                        <input type="checkbox" class="custom-control-input" id="defaultInlined">
+                                        <label class="custom-control-label" for="defaultInlined">789</label>
+                                    </div>
+                                </div>
+                            </div> *@
                             <div class="cent" style="display:flex">
                                 <button type="button" class="btn btn-xs btn-info waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="Apply">送出申請</button>
-                                @*<button type="button" class="btn btn-xs btn-info waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="Sign_Lab" id="sigLAB" style="display:none">簽核LAB</button>
-                                <button type="button" class="btn btn-xs btn-info waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="Sign_QC" id="sigQC" style="display:none">簽核QC</button>
-                                <button type="button" class="btn btn-xs btn-secondary waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="last">上一筆</button>
-                                <button type="button" class="btn btn-xs btn-secondary waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="next">下一筆</button>*@
-                                @*<button type="button" class="btn btn-xs btn-danger waves-effect waves-themed mr-1 mb-1 mt-1" v-on:click="Reject" id="unsig">反簽核</button>*@
                             </div>
                         </div>
                         <p>{{Check}}</p>
                         <hr />
+                        <br />
+                        <br />
                         <div class="frame-wrap w-100 pr-2 pl-2" style="margin-bottom:5px">
                             <div class="accordion" id="accordionExample">
                                 <div class="card">
@@ -102,16 +117,19 @@
                                                 </span>
                                             </span>
                                         </a>
-
-                                        @*<iframe src="~/file/ffdp112_e_ffdp11203212.pdf" style="height:1200px; width:100%"></iframe>*@
                                         <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample" style="">
                                             <div class="card-body">
-                                                <iframe src="~/file/@{
-                                                                                                                                                    @ViewBag.Id
-}.PDF" style="height:1200px; width:100%"></iframe>
-                                                <iframe src="~/file/@{
-                                                                                                                                                    @ViewBag.Id
-}_HLACheck_C.pdf" style="height:1200px; width:100%" class="HLA"></iframe>
+                                                <template>
+                                                    <div class="panel-content" v-for="(item, index) in currentReports" style="margin-bottom:5px !important">
+                                                        <iframe v-bind:src="item" style="height:1200px; width:100%"></iframe>
+                                                    </div>
+                                                </template>
+                                                <div id="uploadsplit"></div>
+                                                <template>
+                                                    <div class="panel-content" v-for="(item, index) in uploadReports" style="margin-bottom:5px !important">
+                                                        <iframe v-bind:src="item" style="height:1200px; width:100%"></iframe>
+                                                    </div>
+                                                </template>
                                             </div>
                                         </div>
                                     </div>
@@ -201,6 +219,9 @@
                 ProductType: "",
                 Reson: "",
                 Check: "",
+                currentReports: [],
+                historyReports: [],
+                uploadReports: []
                 //showInput: false
             },
             mounted() {
@@ -235,6 +256,7 @@
                     });
                 this.InitRecordTable();
                 this.CheckModify();
+                this.GetPdf();
 
                 //if ((DEPARTMENT == "細胞實驗室" || DEPARTMENT == "細胞實驗室") && RANK != "部門主管") {
                 //    $("#Apply").css("display", "");
@@ -264,6 +286,9 @@
                                 });
                             }
                         });
+                },
+                getReport(){
+
                 },
                 CheckModify() {
                     $.ajax({
@@ -337,6 +362,48 @@
                         }
                     });
 
+                },
+
+
+
+                GetPdf() {
+                    $.ajax({
+                        url: `@Url.Content("~/Report/GetPdfUrl")`,
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            Id: '@ViewBag.Id'
+                        },
+                        beforeSend: function (xmlHttp) {
+                            xmlHttp.setRequestHeader("If-Modified-Since", "0");
+                            xmlHttp.setRequestHeader("Cache-Control", "no-cache");
+                        }
+                    })
+                        .done(data => {
+                            console.log(data);
+                            var current = data.currentReports;
+                            var history = data.historyReports;
+                            var upload = data.uploadReports;
+                            if (current.length > 0) {
+                                for (let i = 0; i <= current.length - 1; i++) {
+                                    current[i] += `?q=` + Math.floor(Math.random() * (1000 - 1 + 1)) + 1
+                                }
+                            }
+                            if (history.length > 0) {
+                                for (let i = 0; i <= history.length - 1; i++) {
+                                    history[i] += `?q=` + Math.floor(Math.random() * (1000 - 1 + 1)) + 1
+                                }
+                            }
+                            if (upload.length > 0) {
+                                for (let i = 0; i <= upload.length - 1; i++) {
+                                    upload[i] += `?q=` + Math.floor(Math.random() * (1000 - 1 + 1)) + 1
+                                }
+                                //$("#uploadsplit").append(`<hr><h5 style="margin-left:15px">已上傳報告</h5>`);
+                            }
+                            report_Info.currentReports = current;//data.currentReports;
+                            report_Info.historyReports = history;//data.historyReports;
+                            report_Info.uploadReports = upload;//data.historyReports;
+                        });
                 },
             }
         })

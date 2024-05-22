@@ -12,8 +12,10 @@ namespace CellReport_Workflow.Models.User
         public string? Name { get; set; }
         public string? Emp_Id { get; set; }
         public string? Department { get; set; }
+        public string? Department_Rank { get; set; }
         public string? Rank { get; set; }
         public string? PageEnAble { get; set; }
+        public string? Mail { get; set; }
 
         public void BuildUserByAccount()
         {
@@ -26,6 +28,7 @@ namespace CellReport_Workflow.Models.User
                     Account = user.Account;
                     Name = user.Name;
                     Department = user.Department;
+                    Department_Rank=user.Department_Rank;
                     Rank = user.Rank;
                 }
             }
@@ -41,6 +44,7 @@ namespace CellReport_Workflow.Models.User
                     Account = user.Account;
                     Name = user.Name;
                     Department = user.Department;
+                    Department_Rank = user.Department_Rank;
                     Rank = user.Rank;
                 }
             }
@@ -50,12 +54,14 @@ namespace CellReport_Workflow.Models.User
             try
             {
                 string domainAndUsername = "TPE0M001" + @"\" + Account;
-                System.DirectoryServices.DirectoryEntry entry = new System.DirectoryServices.DirectoryEntry("LDAP://babybanks.com/DC=babybanks,DC=com", domainAndUsername, Password);
-                DirectorySearcher search = new DirectorySearcher(entry);
+                System.DirectoryServices.DirectoryEntry entry = new("LDAP://babybanks.com/DC=babybanks,DC=com", domainAndUsername, Password);
+                DirectorySearcher search = new(entry);
                 search.PropertiesToLoad.Add("cn");
                 SearchResult result = search.FindOne();
                 if (result != null)
+                {
                     return true;
+                }
                 else return false;
             }
             catch (Exception ex)

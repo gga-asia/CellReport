@@ -13,8 +13,10 @@ namespace CellReport_Workflow.Models.Report
         public string? stage { get; set; }
         public string? REC_DATE { get; set; }
         public string? ReportDate { get; set; }
+        public string? Upload_Date { get; set; }
         public string? Final_Date { get; set; }
         public string? CurrentVersion { get; set; }
+       public string? WhoSign { get; set; }
         public VMReportFile? VMReportFile { get; set; }
     }
 }
